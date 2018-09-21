@@ -1,0 +1,6 @@
+# 忽略的文件 及 备份文件夹内部的文件,jekyll站点生成的文件也忽略
+Gemfile.lock
+_backup
+!_backup/
+_site
+!_site/
