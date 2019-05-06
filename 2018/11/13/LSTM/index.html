@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>LSTM | 夕兮曦兮的个人网站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="keywords" content="ice-melt's Blog">
+  
+  <meta name="description" content="LSTM的理解概述LSTM（Long Short-Term Memory）是长短期记忆网络，是一种特殊类型的RNN(Recurrent Neural Network)  下图是RNN的简单示意:与RNN不同的是，LSTM在时间流向上有2个输入和输出，其重复的模块也并非一个单一神经网络层(tanh 层),而是由四个神经网络层以一种非常特殊的方式进行交互，如下图示意:LSTM 有通过精心设计的“门”结">
+<meta name="keywords" content="人工智能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LSTM">
+<meta property="og:url" content="https://ice-melt.github.io/2018/11/13/LSTM/index.html">
+<meta property="og:site_name" content="夕兮曦兮的个人网站">
+<meta property="og:description" content="LSTM的理解概述LSTM（Long Short-Term Memory）是长短期记忆网络，是一种特殊类型的RNN(Recurrent Neural Network)  下图是RNN的简单示意:与RNN不同的是，LSTM在时间流向上有2个输入和输出，其重复的模块也并非一个单一神经网络层(tanh 层),而是由四个神经网络层以一种非常特殊的方式进行交互，如下图示意:LSTM 有通过精心设计的“门”结">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-rnn.png">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-lstm.png">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-ft.png">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-it.png">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-ct.png">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-ot.png">
+<meta property="og:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-type2.png">
+<meta property="og:updated_time" content="2019-05-06T02:33:53.837Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LSTM">
+<meta name="twitter:description" content="LSTM的理解概述LSTM（Long Short-Term Memory）是长短期记忆网络，是一种特殊类型的RNN(Recurrent Neural Network)  下图是RNN的简单示意:与RNN不同的是，LSTM在时间流向上有2个输入和输出，其重复的模块也并非一个单一神经网络层(tanh 层),而是由四个神经网络层以一种非常特殊的方式进行交互，如下图示意:LSTM 有通过精心设计的“门”结">
+<meta name="twitter:image" content="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-rnn.png">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/pace.min.js"></script>
+  
+
+  
+  
+
+  
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+</head>
+</html>
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+      <header id="header">
+    <div id="banner"></div>
+    <div id="header-outer">
+        <div id="header-menu" class="header-menu-pos animated">
+            <div class="header-menu-container">
+                <a href="/" class="left">
+                    <span class="site-title">ice-melt&#39;s Blog</span>
+                </a>
+                <nav id="header-menu-nav" class="right">
+                    
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    
+                    <a href="/archives">
+                        <i class="fa fa-archive"></i>
+                        <span>Archives</span>
+                    </a>
+                    
+                    <a href="/about">
+                        <i class="fa fa-user"></i>
+                        <span>About</span>
+                    </a>
+                    
+                </nav>
+                <a class="mobile-header-menu-button">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+        </div>
+        <div id="header-row">
+            <div id="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="header-info">
+                <div id="header-title">
+                    
+                    <h2>
+                        ice-melt&#39;s Blog
+                    </h2>
+                    
+                </div>
+                <div id="header-description">
+                    
+                    <h3>
+                        冰冻三尺 非一日之寒 积土成山 非斯须之作。
+                    </h3>
+                    
+                </div>
+            </div>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a title="ice-melt" target="_blank" href="http://ice-melt.top">
+                            <i class="fa fa-home fa-2x"></i></a>
+                    
+                        <a title="Github" target="_blank" href="//github.com/ice-melt">
+                            <i class="fa fa-github fa-2x"></i></a>
+                    
+                        <a title="Weibo" target="_blank" href="//weibo.com/ice-melt">
+                            <i class="fa fa-weibo fa-2x"></i></a>
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+      <div class="outer">
+        <section id="main" class="body-wrap"><article id="post-LSTM" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="post-title" itemprop="name">
+      LSTM
+    </h1>
+    <div class="post-title-bar">
+      <ul>
+          
+        <li>
+          <i class="fa fa-calendar"></i>  2018-11-13
+        </li>
+        <li>
+          <i class="fa fa-eye"></i>
+          <span id="busuanzi_value_page_pv"></span>
+        </li>
+      </ul>
+    </div>
+  
+
+          
+      </header>
+    
+    <div class="article-entry post-content" itemprop="articleBody">
+      
+            
+            <h1 id="LSTM的理解"><a href="#LSTM的理解" class="headerlink" title="LSTM的理解"></a>LSTM的理解</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>LSTM（<code>Long Short-Term Memory</code>）是长短期记忆网络，是一种特殊类型的RNN(<code>Recurrent Neural Network</code>) </p>
+<p>下图是RNN的简单示意:<br><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-rnn.png" alt="01"><br>与RNN不同的是，LSTM在时间流向上有2个输入和输出，其重复的模块也并非一个单一神经网络层(tanh 层),而是由四个神经网络层以一种非常特殊的方式进行交互，如下图示意:<br><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-lstm.png" alt="02"><br>LSTM 有通过精心设计的“门”结构(<code>gate</code>)来去除或者增加信息到cell状态的能力。门是一种让信息选择式通过的方法,它们包含一个 sigmoid 神经网络层和一个 elementwise product 操作。Sigmoid 层输出 0 到 1 之间的数值，描述每个部分有多少量可以通过。0 代表“不许任何量通过”，1 就指“允许任意量通过”！ </p>
+<p>接下来梳理一下这些结构(<code>主要是三个门结构</code>)和公式整理</p>
+<h2 id="整体公式一览"><a href="#整体公式一览" class="headerlink" title="整体公式一览"></a>整体公式一览</h2><script type="math/tex; mode=display">\begin{array}{lrr}
+f_t=\sigma(W_f\cdot[h_{t-1},x_t]+b_f)&(1)\\
+i_t=\sigma(W_i\cdot[h_{t-1},x_t]+b_i)&(2)\\
+\tilde{C}_t=\tanh(W_C\cdot[h_{t-1},x_t]+b_C)&(3)\\
+C_t=f_t \odot C_{t-1} + i_t \odot \tilde{C}_t &(4)\\
+o_t=\sigma(W_o\cdot[h_{t-1},x_t]+b_o)&(5)\\
+h_t=o_t \odot \tanh(c_t)&(6)
+\end{array}</script><h2 id="遗忘门"><a href="#遗忘门" class="headerlink" title="遗忘门"></a>遗忘门</h2><p><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-ft.png" alt="03"><br>对应公式（1）：<script type="math/tex">f_t=\sigma(W_f\cdot[h_{t-1},x_t]+b_f)</script><br>forget gate 会读取 <script type="math/tex">h_{t-1}</script> 和 <script type="math/tex">x_t</script>,输出一个在 0 到 1 之间的数值给每个在cell状态<script type="math/tex">C_{t-1}</script>中的数字。1 表示“完全保留”，0 表示“完全舍弃”。<br>这个门决定丢弃信息。</p>
+<h2 id="输入门"><a href="#输入门" class="headerlink" title="输入门"></a>输入门</h2><p><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-it.png" alt="04"><br>对应公式（2）和（3）：  </p>
+<script type="math/tex; mode=display">i_t=\sigma(W_i\cdot[h_{t-1},x_t]+b_i)</script><script type="math/tex; mode=display">\tilde{C}_t=\tanh(W_C\cdot[h_{t-1},x_t]+b_C)</script><p>input gate 中，sigmoid层(输出为0到1的数值)将决定那些值将被更新，之后，一个 tanh 层创建一个新的候选值向量，<script type="math/tex">\tilde{C}_t</script>将会被加到状态中<br>新的状态由遗忘信息和需要更新的信息叠加而成，对应公式（4）：  </p>
+<script type="math/tex; mode=display">C_t=f_t \odot C_{t-1} + i_t \odot \tilde{C}_t</script><p><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-ct.png" alt="06"><br>此时<script type="math/tex">C_{t-1}</script>更新为<script type="math/tex">C_t</script><br>输入门对cell的状态进行更新</p>
+<h2 id="输出门"><a href="#输出门" class="headerlink" title="输出门"></a>输出门</h2><p><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-ot.png" alt="05"><br>对应公式（5）：  </p>
+<script type="math/tex; mode=display">o_t=\sigma(W_o\cdot[h_{t-1},x_t]+b_o)</script><p>这里运行一个 sigmoid 层来确定当前输入的哪些信息将被输出，与当前cell状态的tanh结果做elementwise product后将得到最终需要输出的部分，即公式（6）：  </p>
+<script type="math/tex; mode=display">h_t=o_t \odot \tanh(c_t)</script><p>输出门可以输出信息，具有学习词形的能力  </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>LSTM在算法中加入了一个判断信息有用与否的“处理器”，在反向传播过程中由于公式（4），也解决了传统RNN算法的梯度消失的问题（因为RNN在时间维度不断的对同一个权重矩阵进行更新且为乘积形式更新，而公式（4）为加法） </p>
+<p>关于LSTM也可以通过下图理解<br><img src="https://raw.github.com/ice-melt/picture-set/master/blog/LSTM/lstm-type2.png" alt="08">  </p>
+<script type="math/tex; mode=display">\begin{pmatrix}
+i\\
+f\\
+o\\
+g
+\end{pmatrix}=\begin{pmatrix}
+\sigma\\
+\sigma\\
+\sigma\\
+\tanh
+\end{pmatrix}W\begin{pmatrix}
+h_{t-1}\\
+x_t
+\end{pmatrix}</script><script type="math/tex; mode=display">C_t = f\odot C_{t-1}+i\odot g</script><script type="math/tex; mode=display">h_t = o\odot \tanh(C_t)</script><p>LSTM还有一些变体，后面有时间深入研究的话再行整理</p>
+
+            <div class="post-copyright">
+    <div class="content">
+        <p>最后更新： 2019年05月06日 10:33</p>
+        <p>原始链接： <a class="post-url" href="/2018/11/13/LSTM/" title="LSTM">https://ice-melt.github.io/2018/11/13/LSTM/</a></p>
+        <footer>
+            <a href="https://ice-melt.github.io">
+                <img src="/images/logo.png" alt="ice-melt">
+                ice-melt
+            </a>
+        </footer>
+    </div>
+</div>
+
+      
+        
+            
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;">赏</a>
+</div>
+
+<div id="reward" class="post-modal reward-lay">
+    <a class="close" href="javascript:;" id="reward-close">×</a>
+    <span class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        您的支持是我原创的动力
+        <i class="icon icon-quote-right"></i>
+    </span>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/images/wechat_code.jpg" alt="打赏二维码">
+        </div>
+        <div class="reward-select">
+            
+            <label class="reward-select-item checked" data-id="wechat" data-wechat="/images/wechat_code.jpg">
+                <img class="reward-select-item-wechat" src="/images/wechat.png" alt="微信">
+            </label>
+            
+            
+            <label class="reward-select-item" data-id="alipay" data-alipay="/images/alipay_code.jpg">
+                <img class="reward-select-item-alipay" src="/images/alipay.png" alt="支付宝">
+            </label>
+            
+        </div>
+    </div>
+</div>
+
+
+        
+    </div>
+    <footer class="article-footer">
+        
+        
+<div class="post-share">
+    <a href="javascript:;" id="share-sub" class="post-share-fab">
+        <i class="fa fa-share-alt"></i>
+    </a>
+    <div class="post-share-list" id="share-list">
+        <ul class="share-icons">
+          <li>
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2018/11/13/LSTM/&title=《LSTM》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+              <i class="fa fa-weibo"></i>
+            </a>
+          </li>
+          <li>
+            <a class="weixin share-sns" id="wxFab" href="javascript:;" data-title="微信">
+              <i class="fa fa-weixin"></i>
+            </a>
+          </li>
+          <li>
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2018/11/13/LSTM/&title=《LSTM》 — 夕兮曦兮的个人网站&source=" data-title="QQ">
+              <i class="fa fa-qq"></i>
+            </a>
+          </li>
+          <li>
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2018/11/13/LSTM/" data-title="Facebook">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《LSTM》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2018/11/13/LSTM/&via=https://ice-melt.github.io" data-title="Twitter">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2018/11/13/LSTM/" data-title="Google+">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        </ul>
+     </div>
+</div>
+<div class="post-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;" id="wxShare-close">×</a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2018/11/13/LSTM/" alt="微信分享二维码">
+</div>
+
+<div class="mask"></div>
+
+        
+        <ul class="article-footer-menu">
+            
+            
+  <li class="article-footer-tags">
+    <i class="fa fa-tags"></i>
+      
+    <a href="/tags/人工智能/" class="color5">人工智能</a>
+      
+  </li>
+
+        </ul>
+        
+    </footer>
+  </div>
+</article>
+
+
+    <aside class="post-toc-pos post-toc-top" id="post-toc">
+        <nav class="post-toc-wrap">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#LSTM的理解"><span class="post-toc-text">LSTM的理解</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#概述"><span class="post-toc-text">概述</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#整体公式一览"><span class="post-toc-text">整体公式一览</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#遗忘门"><span class="post-toc-text">遗忘门</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#输入门"><span class="post-toc-text">输入门</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#输出门"><span class="post-toc-text">输出门</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-text">总结</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+
+
+
+    
+        <div id="SOHUCS" sid="LSTM"></div>
+<script type="text/javascript">
+    (function(){
+        var appid = 'cytRPCpOX';
+        var conf = 'prod_1e65dc7b851067d2e5fa952e667c6b16';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+    
+</section>
+        
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+      <p>
+        Powered by  <a href="http://hexo.io/" target="_blank">Hexo</a>
+        Theme <a href="//github.com/wongminho/hexo-theme-miho" target="_blank">MiHo</a>
+      &copy; 2019 ice-melt<br>
+      </p>
+    </div>
+  </div>
+</footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  var mihoConfig = {
+      root: "https://ice-melt.github.io",
+      animate: true,
+      isHome: false,
+      share: true,
+      reward: 1
+  }
+</script>
+<div class="sidebar">
+    <div id="sidebar-search" title="Search">
+        <i class="fa fa-search"></i>
+    </div>
+    <div id="sidebar-category" title="Categories">
+        <i class="fa fa-book"></i>
+    </div>
+    <div id="sidebar-tag" title="Tags">
+        <i class="fa fa-tags"></i>
+    </div>
+    <div id="sidebar-top">
+        <span class="sidebar-top-icon"><i class="fa fa-angle-up"></i></span>
+    </div>
+</div>
+<div class="sidebar-menu-box" id="sidebar-menu-box">
+    <div class="sidebar-menu-box-container">
+        <div id="sidebar-menu-box-categories">
+            
+        </div>
+        <div id="sidebar-menu-box-tags">
+            <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a>
+        </div>
+    </div>
+    <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
+</div>
+<div class="mobile-header-menu-nav" id="mobile-header-menu-nav">
+    <div class="mobile-header-menu-container">
+        <span class="title">Menus</span>
+        <ul class="mobile-header-menu-navbar">
+            
+            <li>
+                <a href="/">
+                    <i class="fa fa-home"></i><span>Home</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/archives">
+                    <i class="fa fa-archive"></i><span>Archives</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/about">
+                    <i class="fa fa-user"></i><span>About</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="mobile-header-tag-container">
+        <span class="title">Tags</span>
+        <div id="mobile-header-container-tags">
+            <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a>
+        </div>
+    </div>
+</div>
+<div class="search-wrap">
+    <span class="search-close">&times;</span>
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+            <i class="icon icon-lg icon-chevron-left"></i>
+        </a>
+        <input class="search-field" placeholder="Search..." id="keywords">
+        <a id="search-submit" href="javascript:;">
+            <i class="fa fa-search"></i>
+        </a>
+    <div class="search-container" id="search-container">
+        <ul class="search-result" id="search-result">
+        </ul>
+    </div>
+</div>
+
+<div id="search-tpl">
+    <li class="search-result-item">
+        <a href="{url}" class="search-item-li">
+            <span class="search-item-li-title" title="{title}">{title}</span>
+        </a>
+    </li>
+</div>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+
+
+  <script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles"></div>
+  <script src="/js/particles.js"></script>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  <script src="//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js"></script>
+  <script src="/js/animate.js"></script>
+
+
+  <script src="/js/pop-img.js"></script>
+  <script>
+     $(".article-entry p img").popImg();
+  </script>
+
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
