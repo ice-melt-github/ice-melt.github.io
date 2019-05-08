@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Python自然语言处理02 获得文本语料和词汇资源 | 夕兮曦兮的个人网站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="keywords" content="ice-melt's Blog">
+  
+  <meta name="description" content="前言">
+<meta name="keywords" content="Python自然语言处理,NLP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python自然语言处理02 获得文本语料和词汇资源">
+<meta property="og:url" content="https://ice-melt.github.io/2019/05/06/Python-NLP-02/index.html">
+<meta property="og:site_name" content="夕兮曦兮的个人网站">
+<meta property="og:description" content="前言">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-05-08T03:56:59.601Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python自然语言处理02 获得文本语料和词汇资源">
+<meta name="twitter:description" content="前言">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/pace.min.js"></script>
+  
+
+  
+  
+
+  
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+</head>
+</html>
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+      <header id="header">
+    <div id="banner"></div>
+    <div id="header-outer">
+        <div id="header-menu" class="header-menu-pos animated">
+            <div class="header-menu-container">
+                <a href="/" class="left">
+                    <span class="site-title">ice-melt&#39;s Blog</span>
+                </a>
+                <nav id="header-menu-nav" class="right">
+                    
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    
+                    <a href="/archives">
+                        <i class="fa fa-archive"></i>
+                        <span>Archives</span>
+                    </a>
+                    
+                    <a href="/about">
+                        <i class="fa fa-user"></i>
+                        <span>About</span>
+                    </a>
+                    
+                </nav>
+                <a class="mobile-header-menu-button">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+        </div>
+        <div id="header-row">
+            <div id="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="header-info">
+                <div id="header-title">
+                    
+                    <h2>
+                        ice-melt&#39;s Blog
+                    </h2>
+                    
+                </div>
+                <div id="header-description">
+                    
+                    <h3>
+                        冰冻三尺 非一日之寒 积土成山 非斯须之作。
+                    </h3>
+                    
+                </div>
+            </div>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a title="ice-melt" target="_blank" href="https://ice-melt.github.io/">
+                            <i class="fa fa-home fa-2x"></i></a>
+                    
+                        <a title="Github" target="_blank" href="//github.com/ice-melt">
+                            <i class="fa fa-github fa-2x"></i></a>
+                    
+                        <a title="Weibo" target="_blank" href="//weibo.com/ice-melt">
+                            <i class="fa fa-weibo fa-2x"></i></a>
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+      <div class="outer">
+        <section id="main" class="body-wrap"><article id="post-Python-NLP-02" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="post-title" itemprop="name">
+      Python自然语言处理02 获得文本语料和词汇资源
+    </h1>
+    <div class="post-title-bar">
+      <ul>
+          
+        <li>
+          <i class="fa fa-calendar"></i>  2019-05-06
+        </li>
+        <li>
+          <i class="fa fa-eye"></i>
+          <span id="busuanzi_value_page_pv"></span>
+        </li>
+      </ul>
+    </div>
+  
+
+          
+      </header>
+    
+    <div class="article-entry post-content" itemprop="articleBody">
+      
+            
+            <p>前言<br><a id="more"></a></p>
+<h3 id="2-1-获取文本语料库"><a href="#2-1-获取文本语料库" class="headerlink" title="2.1 获取文本语料库"></a>2.1 获取文本语料库</h3><h4 id="古腾堡语料库"><a href="#古腾堡语料库" class="headerlink" title="古腾堡语料库"></a>古腾堡语料库</h4><p><a href="http://www.gutenberg.org" target="_blank" rel="noopener">http://www.gutenberg.org</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">nltk.corpus.gutenberg.fileids()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['austen-emma.txt', 'austen-persuasion.txt', 'austen-sense.txt', 'bible-kjv.txt', 'blake-poems.txt', </span></span><br><span class="line"><span class="string">'bryant-stories.txt', 'burgess-busterbrown.txt', 'carroll-alice.txt', 'chesterton-ball.txt', 'chesterton-brown.txt', </span></span><br><span class="line"><span class="string">'chesterton-thursday.txt', 'edgeworth-parents.txt', 'melville-moby_dick.txt', 'milton-paradise.txt', </span></span><br><span class="line"><span class="string">'shakespeare-caesar.txt', 'shakespeare-hamlet.txt', 'shakespeare-macbeth.txt', 'whitman-leaves.txt']</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">emma =  nltk.corpus.gutenberg.words(<span class="string">'austen-emma.txt'</span>)</span><br><span class="line"><span class="string">"""['[', 'Emma', 'by', 'Jane', 'Austen', '1816', ']', ...]"""</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 研究nltk.corpus中的数据</span></span><br><span class="line">emma_text = nltk.Text(emma)</span><br><span class="line">emma_text.concordance(<span class="string">"surprize"</span>)</span><br></pre></td></tr></table></figure></p>
+<h4 id="网络聊天文本"><a href="#网络聊天文本" class="headerlink" title="网络聊天文本"></a>网络聊天文本</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> webtext</span><br><span class="line"><span class="keyword">for</span> fileid <span class="keyword">in</span> webtext.fileids():</span><br><span class="line">	print(fileid,webtext.raw(fileid)[:<span class="number">30</span>],<span class="string">'...'</span>)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">firefox.txt Cookie Manager: "Don't allow s ...</span></span><br><span class="line"><span class="string">grail.txt SCENE 1: [wind] [clop clop clo ...</span></span><br><span class="line"><span class="string">overheard.txt White guy: So, do you have any ...</span></span><br><span class="line"><span class="string">pirates.txt PIRATES OF THE CARRIBEAN: DEAD ...</span></span><br><span class="line"><span class="string">singles.txt 25 SEXY MALE, seeks attrac old ...</span></span><br><span class="line"><span class="string">wine.txt Lovely delicate, fragrant Rhon ...</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> nps_chat</span><br><span class="line">chatroom = nps_chat.posts(<span class="string">'10-19-20s_706posts.xml'</span>)</span><br><span class="line">chatroom[<span class="number">123</span>]</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['i', 'do', "n't", 'want', 'hot', 'pics', 'of', 'a', 'female', ',', 'I', 'can',</span></span><br><span class="line"><span class="string">'look', 'in', 'a', 'mirror', '.']</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">即时消息聊天群会话语料库</span></span><br><span class="line"><span class="string">10-19-20s_706posts.xml表示2006年10月19日从20多岁聊天室收集的706个帖子</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<h4 id="布朗语料库"><a href="#布朗语料库" class="headerlink" title="布朗语料库"></a>布朗语料库</h4><p>布朗大学1961年创建,第一个百万词级的英语电子语料库</p>
+<p>文体列表参见<a href="http://icame.uib.no/brown/bcm-los.html" target="_blank" rel="noopener">http://icame.uib.no/brown/bcm-los.html</a></p>
+<blockquote>
+<p>注 访问不了</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> brown</span><br><span class="line">brown.categories()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['adventure', 'belles_lettres', 'editorial', 'fiction', 'government', 'hobbies',</span></span><br><span class="line"><span class="string"> 'humor', 'learned', 'lore', 'mystery', 'news', 'religion', 'reviews', 'romance'</span></span><br><span class="line"><span class="string">, 'science_fiction']</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<h4 id="路透社语料库"><a href="#路透社语料库" class="headerlink" title="路透社语料库"></a>路透社语料库</h4><p>10788个新闻文档,130万字,90个主题,按照”训练”和”测试”分为2组<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> reuters</span><br><span class="line">reuters.fileids()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['test/14826', 'test/14828', 'test/14829', 'test/14832', 'test/14833', 'test/148</span></span><br><span class="line"><span class="string">39', 'test/14840', 'test/14841', ...]</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="就职演说语料库"><a href="#就职演说语料库" class="headerlink" title="就职演说语料库"></a>就职演说语料库</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> inaugural</span><br></pre></td></tr></table></figure>
+<h4 id="标注文本语料库"><a href="#标注文本语料库" class="headerlink" title="标注文本语料库"></a>标注文本语料库</h4><p>语言学标注:</p>
+<ul>
+<li>词性标注</li>
+<li>命名实体</li>
+<li>句法结构</li>
+<li>语义角色</li>
+</ul>
+<blockquote>
+<p>NLTK中的一些语料库和语料库样本参见<br><a href="http://www.nltk.org/nltk_data/" target="_blank" rel="noopener">http://www.nltk.org/nltk_data/</a></p>
+</blockquote>
+<h4 id="其他语言的语料库"><a href="#其他语言的语料库" class="headerlink" title="其他语言的语料库"></a>其他语言的语料库</h4><p>“世界人权宣言”udhr</p>
+<h4 id="文本语料库的结构"><a href="#文本语料库的结构" class="headerlink" title="文本语料库的结构"></a>文本语料库的结构</h4><blockquote>
+<p>表2-3 NLTK中定义的基本语料库函数(略)</p>
+</blockquote>
+<p><code>help(nltk.corpus.reader)</code></p>
+<p>或查阅</p>
+<p><a href="http://www.nltk.org/howto/corpus.html" target="_blank" rel="noopener">http://www.nltk.org/howto/corpus.html</a></p>
+<h4 id="载入你自己的语料库"><a href="#载入你自己的语料库" class="headerlink" title="载入你自己的语料库"></a>载入你自己的语料库</h4><ul>
+<li><p>PlaintextCorpusReader</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> PlaintextCorpusReader</span><br><span class="line">corpus_root = <span class="string">r'F:\workspace\pycharm\nlp_corpus\project_data\history\201904091317'</span></span><br><span class="line">file_pattern = <span class="string">r'.*'</span></span><br><span class="line">wordlists=PlaintextCorpusReader(corpus_root,file_pattern)</span><br><span class="line">wordlists.fileids()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['abstract.txt', 'pubmed_exist_id.txt', 'pubmed_info.txt', 'pubmed_miss_id.txt']</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>BracketParseCorpusReader</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> BracketParseCorpusReader</span><br><span class="line">corpus_root = <span class="string">r'F:\workspace\pycharm\nlp_corpus\project_data\history\201904091317'</span></span><br><span class="line">file_pattern = <span class="string">r'.*'</span></span><br><span class="line">wordlists=BracketParseCorpusReader(corpus_root,file_pattern)</span><br><span class="line">wordlists.fileids()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['abstract.txt', 'pubmed_exist_id.txt', 'pubmed_info.txt', 'pubmed_miss_id.txt']</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="2-2-条件频率分布"><a href="#2-2-条件频率分布" class="headerlink" title="2.2 条件频率分布"></a>2.2 条件频率分布</h3><h4 id="条件和事件"><a href="#条件和事件" class="headerlink" title="条件和事件"></a>条件和事件</h4><p>条件频率分布需要给每个事件关联一个条件,<br>处理一系列配对序列(不是处理一个词序列)<br>每对的形式:(条件,事件)</p>
+<h4 id="按文本计数词汇"><a href="#按文本计数词汇" class="headerlink" title="按文本计数词汇"></a>按文本计数词汇</h4><ul>
+<li><code>FreqDist()</code> 以一个简单的链表作为输入</li>
+<li><code>ConditionalFreqDist()</code> 以一个配对链表作为输入</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> brown</span><br><span class="line">cfd = nltk.ConditionalFreqDist(</span><br><span class="line">		(genre,word)</span><br><span class="line">		<span class="keyword">for</span> genre <span class="keyword">in</span> brown.categories()</span><br><span class="line">		<span class="keyword">for</span> word <span class="keyword">in</span> brown.words(categories=genre)</span><br><span class="line">		)</span><br></pre></td></tr></table></figure>
+<h4 id="绘制分布图和分布表"><a href="#绘制分布图和分布表" class="headerlink" title="绘制分布图和分布表"></a>绘制分布图和分布表</h4><p>在<code>plot()</code>和<code>tabulate()</code>方法中,<br>可以使用 <code>conditions=</code>参数指定现实哪些条件<br>可以使用 <code>samples=</code>参数来限制要显示的样本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> inaugural</span><br><span class="line"></span><br><span class="line">cfd = nltk.ConditionalFreqDist(</span><br><span class="line">		(target,fileid[:<span class="number">4</span>])</span><br><span class="line">		<span class="keyword">for</span> fileid <span class="keyword">in</span> inaugural.fileids()</span><br><span class="line">		<span class="keyword">for</span> w <span class="keyword">in</span> inaugural.words(fileid)</span><br><span class="line">		<span class="keyword">for</span> target <span class="keyword">in</span> [<span class="string">'america'</span>,<span class="string">'citizen'</span>]</span><br><span class="line">		<span class="keyword">if</span> w.lower().startswith(target))</span><br><span class="line">cfd</span><br><span class="line"><span class="string">"""&lt;ConditionalFreqDist with 2 conditions&gt;"""</span></span><br><span class="line"></span><br><span class="line">cfd[<span class="string">'america'</span>]</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">FreqDist(&#123;'1993': 33, '1997': 31, '2005': 30, '1921': 24, '1973': 23, '1985': 21</span></span><br><span class="line"><span class="string">, '2001': 20, '1981': 16, '2009': 15, '1909': 12, ...&#125;)</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">cfd[<span class="string">'citizen'</span>]</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">FreqDist(&#123;'1841': 38, '1821': 15, '1817': 14, '1885': 13, '1889': 12, '1929': 12</span></span><br><span class="line"><span class="string">, '1845': 11, '2001': 11, '1805': 10, '1893': 10, ...&#125;)</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">cfd[<span class="string">'citizen'</span>][<span class="string">'1841'</span>]</span><br><span class="line"><span class="string">"""38"""</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> udhr</span><br><span class="line">languages = [<span class="string">'Chickasaw'</span>,<span class="string">'English'</span>,<span class="string">'German_Deutsch'</span>,<span class="string">'Greenlandic_Inuktikut'</span>,<span class="string">'Hungarian_Magyar'</span>,<span class="string">'Ibibio_Efik'</span>]</span><br><span class="line">cfd = nltk.ConditionalFreqDist(</span><br><span class="line">	(lang,len(word))</span><br><span class="line">	<span class="keyword">for</span> lang <span class="keyword">in</span> languages</span><br><span class="line">	<span class="keyword">for</span> word <span class="keyword">in</span> udhr.words(lang+<span class="string">'-Latin1'</span>))</span><br><span class="line">cfd.tabulate(conditions=[<span class="string">'English'</span>,<span class="string">'German_Deutsch'</span>],</span><br><span class="line">	samples=range(<span class="number">10</span>), cumulative=<span class="literal">True</span>)	</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">                  0    1    2    3    4    5    6    7    8    9</span></span><br><span class="line"><span class="string">       English    0  185  525  883  997 1166 1283 1440 1558 1638</span></span><br><span class="line"><span class="string">German_Deutsch    0  171  263  614  717  894 1013 1110 1213 1275</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<h4 id="使用双联词生成随机文本"><a href="#使用双联词生成随机文本" class="headerlink" title="使用双联词生成随机文本"></a>使用双联词生成随机文本</h4><p><code>bigrams()</code>函数接受一个词汇链表,并建立一个连续的词对链表</p>
+<p>选择一个词作为初始内容—种子词</p>
+<p>将每个词作为一个条件,对于每个词都有效地依据后续词的创建频率分布</p>
+<p><code>缺点</code>:这种简单的文本生成方法会在循环中卡主</p>
+<p><code>改进</code>:在可用的词汇中随机选择下一个词</p>
+<h3 id="2-3-更多关于-Python-代码重用-略"><a href="#2-3-更多关于-Python-代码重用-略" class="headerlink" title="2.3 更多关于 Python: 代码重用(略)"></a>2.3 更多关于 Python: 代码重用(略)</h3><h4 id="使用文本编辑器创建程序"><a href="#使用文本编辑器创建程序" class="headerlink" title="使用文本编辑器创建程序"></a>使用文本编辑器创建程序</h4><h4 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h4><h4 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h4><h3 id="2-4-词典资源"><a href="#2-4-词典资源" class="headerlink" title="2.4 词典资源"></a>2.4 词典资源</h3><p><code>词项</code>包括<code>词目</code>(也叫<code>词条</code>)及其他<code>附加信息</code>。</p>
+<p>两个含义不同但拼写想同的分词被称为同音异义词。</p>
+<h4 id="词汇列表语料库"><a href="#词汇列表语料库" class="headerlink" title="词汇列表语料库"></a>词汇列表语料库</h4><p>目的:过滤文本</p>
+<ul>
+<li>词汇语料库是 <code>UNIX</code> 中的<code>/usr/dict/words</code>文件,<ul>
+<li><code>from nltk.corpus import words</code></li>
+<li><code>words.words()</code></li>
+</ul>
+</li>
+<li>停用词语料库 (过滤高频词)<ul>
+<li><code>from nltk.corpus import stopwords</code></li>
+<li><code>stopwords.words(&quot;english&quot;)</code></li>
+</ul>
+</li>
+<li>名字词语料库 <ul>
+<li><code>from nltk.corpus import names</code></li>
+<li><code>names.words(&#39;male.txt&#39;),names.words(&#39;female.txt&#39;),</code><h4 id="发音的词典"><a href="#发音的词典" class="headerlink" title="发音的词典"></a>发音的词典</h4>表格(或电子表格)在每一行中含有一个词及其一些性质</li>
+</ul>
+</li>
+</ul>
+<p>NLTK中包括美国英语的 CMU 发音词典,它是为语音合成器而设计的</p>
+<ul>
+<li><code>from nltk.corpus import cmudict</code></li>
+<li><code>cmudict.entries()</code></li>
+</ul>
+<p>任意一个词,词典资源都有语音的代码(不同的声音有着不同的标签,称为音素)</p>
+<p>CMU 发音词典中的符号是从 Arpabet 来的,详情参考<a href="https://en.wikipedia.org/wiki/ARPABET" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/ARPABET</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">print([w <span class="keyword">for</span> w, pron <span class="keyword">in</span> entries <span class="keyword">if</span> pron[<span class="number">-1</span>] == <span class="string">'M'</span> <span class="keyword">and</span> w[<span class="number">-1</span>] == <span class="string">'n'</span>])</span><br><span class="line">print(sorted(set(w[:<span class="number">2</span>] <span class="keyword">for</span> w, pron <span class="keyword">in</span> entries <span class="keyword">if</span> pron[<span class="number">0</span>] == <span class="string">'N'</span> <span class="keyword">and</span> w[<span class="number">0</span>] != <span class="string">'n'</span>)))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['autumn', 'column', 'condemn', 'damn', 'goddamn', 'hymn', 'solemn']</span></span><br><span class="line"><span class="string">['gn', 'kn', 'mn', 'pn']</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p><strong>音素</strong>包含数字表示</p>
+<ul>
+<li>主重音(1)</li>
+<li>次重音(2)</li>
+<li>无重音(0)<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stress</span><span class="params">(pron)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> [char <span class="keyword">for</span> phone <span class="keyword">in</span> pron <span class="keyword">for</span> char <span class="keyword">in</span> phone <span class="keyword">if</span> char.isdigit()]</span><br><span class="line"></span><br><span class="line">entries = nltk.corpus.cmudict.entries()</span><br><span class="line">print([w <span class="keyword">for</span> w, pron <span class="keyword">in</span> entries <span class="keyword">if</span> stress(pron) == [<span class="string">'0'</span>, <span class="string">'1'</span>, <span class="string">'0'</span>, <span class="string">'2'</span>, <span class="string">'0'</span>]])</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['abbreviated', 'abbreviated', 'abbreviating', ...]</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>通过指定词典的名字及后面带方括号的<strong>关键字</strong>来查词典</p>
+<ul>
+<li><code>prondict = nltk.corpus.cmudict.dict()</code></li>
+<li><code>prondict[&#39;fire&#39;]</code><h4 id="比较词表"><a href="#比较词表" class="headerlink" title="比较词表"></a>比较词表</h4>词典表格的另一例子是比较词表</li>
+</ul>
+<p>NLTK中包含<strong>斯瓦迪士核心词列表</strong>(<code>Swadesh wordlists</code>),</p>
+<ul>
+<li>包括几种语言的约200个常用词列表</li>
+<li>语言标识符使用 ISO639双字母码</li>
+</ul>
+<p>核心词语料库</p>
+<ul>
+<li><code>from nltk.corpus import swadesh</code></li>
+<li>指定一个语言链表来访问多语言中的同源词,或转换成一个简单的词典</li>
+<li><code>fr2en = swadesh.entries(&#39;fr&#39;,&#39;en&#39;)</code><h4 id="词汇工具-Toolbox-和-Shoebox"><a href="#词汇工具-Toolbox-和-Shoebox" class="headerlink" title="词汇工具:Toolbox 和 Shoebox"></a>词汇工具:Toolbox 和 Shoebox</h4></li>
+</ul>
+<p>Toolbox下载:<a href="https://software.sil.org/toolbox/" target="_blank" rel="noopener">https://software.sil.org/toolbox/</a></p>
+<ul>
+<li><p>罗托卡特语(Rotokas)词典</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> toolbox</span><br><span class="line">toolbox.entries(<span class="string">'rotokas.dic'</span>)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">[('kaa', [('ps', 'V'), ('pt', 'A'), ('ge', 'gag'), ('tkp', 'nek i pas'), ('dcsv', 'true'), ('vx', '1'), ('sc', '???'), ('dt', '29/Oct/2005'), </span></span><br><span class="line"><span class="string">('ex', 'Apoka irakaaroi aioa-ia reoreopaoro.'), </span></span><br><span class="line"><span class="string">('xp', 'Kaikai i pas long nek bilong Apoka bikosem i kaikai na toktok.'), </span></span><br><span class="line"><span class="string">('xe', 'Apoka is gagging from food while talking.')]),...]</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="comment"># ('ps','V')-词性是'V'(动词)</span></span><br><span class="line"><span class="comment"># ('ge', 'gag')-英文注释是'gag'</span></span><br><span class="line"><span class="comment"># ex-罗托卡特语例句;xp,xe-巴布亚皮欣语和英语的翻译</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Toolbox文件由一些条目的集合组成,</p>
+</li>
+<li>其中每个条目由一个或多个字段组成.</li>
+<li>大多数字段都是可选的或重复的</li>
+<li>这个词汇资源不能作为一个表格或电子表格来处理</li>
+<li>条目包括一系列”属性-值”对<h3 id="2-5-WordNet"><a href="#2-5-WordNet" class="headerlink" title="2.5 WordNet"></a>2.5 WordNet</h3>wordnet 是面向语义的英语词典</li>
+</ul>
+<h4 id="意义与同义词"><a href="#意义与同义词" class="headerlink" title="意义与同义词"></a>意义与同义词</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> wordnet</span><br><span class="line">wordnet.synsets(<span class="string">'motorcar'</span>)  <span class="comment"># car的第一个名词意义</span></span><br><span class="line">wordnet.synset(<span class="string">'car.n.01'</span>).lemma_names()  <span class="comment"># 同义词集</span></span><br><span class="line">wordnet.synset(<span class="string">'car.n.01'</span>).definition()  <span class="comment"># 词集定义</span></span><br><span class="line">wordnet.synset(<span class="string">'car.n.01'</span>).examples()  <span class="comment"># 词集例句</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">[Synset('car.n.01')]</span></span><br><span class="line"><span class="string">['car', 'auto', 'automobile', 'machine', 'motorcar']</span></span><br><span class="line"><span class="string">a motor vehicle with four wheels; usually propelled by an internal combustion engine</span></span><br><span class="line"><span class="string">['he needs a car to get to work']</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p>为消除歧义,将这些词标注为<code>car.n.01.automobile</code>,<code>car.n.01.motorcar</code>等</p>
+<p>这种同义词集和词的配对叫做<strong>词条</strong></p>
+<ul>
+<li><code>wordnet.synset(&#39;car.n.01&#39;).lemmas()</code>  # 指定同义词集的所有词条<blockquote>
+<p>[Lemma(‘car.n.01.car’), Lemma(‘car.n.01.auto’), Lemma(‘car.n.01.automobile’), Le<br>mma(‘car.n.01.machine’), Lemma(‘car.n.01.motorcar’)]</p>
+</blockquote>
+</li>
+<li><code>wordnet.lemma(&#39;car.n.01.automobile&#39;)</code>  # 查找特定词条<blockquote>
+<p>Lemma(‘car.n.01.automobile’)</p>
+</blockquote>
+</li>
+<li><code>wordnet.lemma(&#39;car.n.01.automobile&#39;).synset()</code>  # 查找一个词条所对应的同义词集<blockquote>
+<p>Synset(‘car.n.01’)</p>
+</blockquote>
+</li>
+<li><code>wordnet.lemma(&#39;car.n.01.automobile&#39;).name()</code>  # 得到一个词条的名字<blockquote>
+<p>‘automobile’</p>
+</blockquote>
+</li>
+<li><code>wordnet.lemmas(&#39;car&#39;)</code>  # 访问所有包含词car的词条<blockquote>
+<p>[Lemma(‘car.n.01.car’), Lemma(‘car.n.02.car’), Lemma(‘car.n.03.car’), Lemma(‘car<br>.n.04.car’), Lemma(‘cable_car.n.01.car’)]</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="WordNet-的层次结构"><a href="#WordNet-的层次结构" class="headerlink" title="WordNet 的层次结构"></a>WordNet 的层次结构</h4><p>树状层级结构,每个节点对应一个同义词集;边表示上位词/下位词关系(即上级概念与从属概念的关系)</p>
+<ul>
+<li><p>通过访问上位词来操纵层次结构</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> wordnet <span class="keyword">as</span> wn</span><br><span class="line">motorcar = wn.synset(<span class="string">'car.n.01'</span>)</span><br><span class="line">types_of_motorcar = motorcar.hyponyms()</span><br><span class="line">types_of_motorcar[<span class="number">26</span>]</span><br><span class="line"></span><br><span class="line"><span class="string">"""Synset('stanley_steamer.n.01')"""</span></span><br><span class="line"></span><br><span class="line">sorted([lemma.name() <span class="keyword">for</span> synset <span class="keyword">in</span> types_of_motorcar <span class="keyword">for</span> lemma <span class="keyword">in</span> synset.lemmas()])</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">['Model_T', 'S.U.V.', 'SUV', 'Stanley_Steamer', 'ambulance', 'beach_waggon', 'be</span></span><br><span class="line"><span class="string">ach_wagon', 'bus', 'cab', 'compact', 'compact_car', 'convertible', 'coupe', 'cru</span></span><br><span class="line"><span class="string">iser', 'electric', 'electric_automobile', 'electric_car', 'estate_car', 'gas_guz</span></span><br><span class="line"><span class="string">zler', 'hack', 'hardtop', 'hatchback', 'heap', 'horseless_carriage', 'hot-rod',</span></span><br><span class="line"><span class="string">'hot_rod', 'jalopy', 'jeep', 'landrover', 'limo', 'limousine', 'loaner', 'minica</span></span><br><span class="line"><span class="string">r', 'minivan', 'pace_car', 'patrol_car', 'phaeton', 'police_car', 'police_cruise</span></span><br><span class="line"><span class="string">r', 'prowl_car', 'race_car', 'racer', 'racing_car', 'roadster', 'runabout', 'sal</span></span><br><span class="line"><span class="string">oon', 'secondhand_car', 'sedan', 'sport_car', 'sport_utility', 'sport_utility_ve</span></span><br><span class="line"><span class="string">hicle', 'sports_car', 'squad_car', 'station_waggon', 'station_wagon', 'stock_car</span></span><br><span class="line"><span class="string">', 'subcompact', 'subcompact_car', 'taxi', 'taxicab', 'tourer', 'touring_car', '</span></span><br><span class="line"><span class="string">two-seater', 'used-car', 'waggon', 'wagon']</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>motorcar.root_hypernyms()</code>  # 得到一个最笼统的上位(或根上位)同义词集</p>
+</li>
+<li>图形化WordNet浏览器:<code>nltk.app.wordnet()</code><h4 id="更多的词汇关系"><a href="#更多的词汇关系" class="headerlink" title="更多的词汇关系"></a>更多的词汇关系</h4></li>
+<li>上位词和下位词被称为<strong>词汇关系</strong>,是上下定位”is-a”层次</li>
+<li>从条目的部件(部分)或到包含它们的东西(整体)<ul>
+<li><code>part_meronyms()</code>  # 部分</li>
+<li><code>substance_meronyms()</code>  # 整体</li>
+<li><code>member_holonyms()</code>  # 集合</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">wn.synset(<span class="string">'tree.n.01'</span>).part_meronyms()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">[Synset('burl.n.02'), Synset('crown.n.07'), Synset('limb.n.02'), Synset('stump.n.01'), Synset('trunk.n.01')]</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">wn.synset(<span class="string">'tree.n.01'</span>).substance_meronyms()</span><br><span class="line"><span class="string">"""[Synset('heartwood.n.01'), Synset('sapwood.n.01')]"""</span></span><br><span class="line"></span><br><span class="line">wn.synset(<span class="string">'tree.n.01'</span>).member_holonyms()</span><br><span class="line"><span class="string">"""[Synset('forest.n.01')]"""</span></span><br><span class="line">```	</span><br><span class="line">- 单词有密切相关的意思</span><br><span class="line">- 动词有多个含义</span><br><span class="line">	- `wn.synset(<span class="string">'walk.n.01'</span>).entailments()`</span><br><span class="line">- 反义词</span><br><span class="line">	- `wn.lemma(<span class="string">'supply.n.02.supply'</span>).antonyms()`</span><br><span class="line">- 使用dir()查看词汇关系和同义词集上定义的其他方法</span><br><span class="line">	- `dir(wn.synset(<span class="string">'harmony.n.02'</span>))`</span><br><span class="line"><span class="comment">#### 语义相似度</span></span><br><span class="line">如果两个同义词集公用一个特定的上位词(在上位词层次结构中属于较低层),它们一定有密切的联系</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">通过查找每个同义词集的深度来量化这个普遍性概念</span><br><span class="line">```python</span><br><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> wordnet <span class="keyword">as</span> wn</span><br><span class="line"></span><br><span class="line">right = wn.synset(<span class="string">'right_whale.n.01'</span>)</span><br><span class="line">orca = wn.synset(<span class="string">'orca.n.01'</span>)</span><br><span class="line">minke = wn.synset(<span class="string">'minke_whale.n.01'</span>)</span><br><span class="line">tortoise = wn.synset(<span class="string">'tortoise.n.01'</span>)</span><br><span class="line">novel = wn.synset(<span class="string">'novel.n.01'</span>)</span><br><span class="line"></span><br><span class="line">hypernym1, hypernym2, hypernym3, hypernym4 = (</span><br><span class="line">	right.lowest_common_hypernyms(minke)</span><br><span class="line">	, right.lowest_common_hypernyms(orca)</span><br><span class="line">	, right.lowest_common_hypernyms(tortoise)</span><br><span class="line">	, right.lowest_common_hypernyms(novel)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">print(hypernym1, hypernym2, hypernym3, hypernym4)</span><br><span class="line"></span><br><span class="line">depth1, depth2, depth3, depth4 = (</span><br><span class="line">	wn.synset(<span class="string">'baleen_whale.n.01'</span>).min_depth(),</span><br><span class="line">	wn.synset(<span class="string">'whale.n.02'</span>).min_depth(),</span><br><span class="line">	wn.synset(<span class="string">'vertebrate.n.01'</span>).min_depth(),</span><br><span class="line">	wn.synset(<span class="string">'entity.n.01'</span>).min_depth(),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">print(depth1, depth2, depth3, depth4)</span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">[Synset('baleen_whale.n.01')]  # 须鲸</span></span><br><span class="line"><span class="string">[Synset('whale.n.02')]  # 鲸鱼</span></span><br><span class="line"><span class="string">[Synset('vertebrate.n.01')]  # 脊椎动物</span></span><br><span class="line"><span class="string">[Synset('entity.n.01')]  # 实体</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">14 13 8 0</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<p>基于上位词层次结构中相互关联的最短路径下的相似度方法(归一化,无路径时返回-1):</p>
+<ul>
+<li><code>right.path_similarity(minke)  # return 0.25,越相似值越大,最大为1</code>  </li>
+</ul>
+<blockquote>
+<p><code>help(wn)</code> 获得更多信息<br>NLTK包括 VerbNet(连接到WordNet的层次结构动词词典,<code>nltk.corpus.verbnet</code> 访问) </p>
+</blockquote>
+
+            <div class="post-copyright">
+    <div class="content">
+        <p>最后更新： 2019年05月08日 11:56</p>
+        <p>原始链接： <a class="post-url" href="/2019/05/06/Python-NLP-02/" title="Python自然语言处理02 获得文本语料和词汇资源">https://ice-melt.github.io/2019/05/06/Python-NLP-02/</a></p>
+        <footer>
+            <a href="https://ice-melt.github.io">
+                <img src="/images/logo.png" alt="ice-melt">
+                ice-melt
+            </a>
+        </footer>
+    </div>
+</div>
+
+      
+        
+            
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;">赏</a>
+</div>
+
+<div id="reward" class="post-modal reward-lay">
+    <a class="close" href="javascript:;" id="reward-close">×</a>
+    <span class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        您的支持是我原创的动力
+        <i class="icon icon-quote-right"></i>
+    </span>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/images/wechat_code.jpg" alt="打赏二维码">
+        </div>
+        <div class="reward-select">
+            
+            <label class="reward-select-item checked" data-id="wechat" data-wechat="/images/wechat_code.jpg">
+                <img class="reward-select-item-wechat" src="/images/wechat.png" alt="微信">
+            </label>
+            
+            
+            <label class="reward-select-item" data-id="alipay" data-alipay="/images/alipay_code.jpg">
+                <img class="reward-select-item-alipay" src="/images/alipay.png" alt="支付宝">
+            </label>
+            
+        </div>
+    </div>
+</div>
+
+
+        
+    </div>
+    <footer class="article-footer">
+        
+        
+<div class="post-share">
+    <a href="javascript:;" id="share-sub" class="post-share-fab">
+        <i class="fa fa-share-alt"></i>
+    </a>
+    <div class="post-share-list" id="share-list">
+        <ul class="share-icons">
+          <li>
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/05/06/Python-NLP-02/&title=《Python自然语言处理02 获得文本语料和词汇资源》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+              <i class="fa fa-weibo"></i>
+            </a>
+          </li>
+          <li>
+            <a class="weixin share-sns" id="wxFab" href="javascript:;" data-title="微信">
+              <i class="fa fa-weixin"></i>
+            </a>
+          </li>
+          <li>
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/05/06/Python-NLP-02/&title=《Python自然语言处理02 获得文本语料和词汇资源》 — 夕兮曦兮的个人网站&source=前言" data-title="QQ">
+              <i class="fa fa-qq"></i>
+            </a>
+          </li>
+          <li>
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/05/06/Python-NLP-02/" data-title="Facebook">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理02 获得文本语料和词汇资源》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/05/06/Python-NLP-02/&via=https://ice-melt.github.io" data-title="Twitter">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/05/06/Python-NLP-02/" data-title="Google+">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        </ul>
+     </div>
+</div>
+<div class="post-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;" id="wxShare-close">×</a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/05/06/Python-NLP-02/" alt="微信分享二维码">
+</div>
+
+<div class="mask"></div>
+
+        
+        <ul class="article-footer-menu">
+            
+            
+  <li class="article-footer-tags">
+    <i class="fa fa-tags"></i>
+      
+    <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
+      
+    <a href="/tags/NLP/" class="color4">NLP</a>
+      
+  </li>
+
+        </ul>
+        
+    </footer>
+  </div>
+</article>
+
+
+    <aside class="post-toc-pos post-toc-top" id="post-toc">
+        <nav class="post-toc-wrap">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-1-获取文本语料库"><span class="post-toc-text">2.1 获取文本语料库</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#古腾堡语料库"><span class="post-toc-text">古腾堡语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#网络聊天文本"><span class="post-toc-text">网络聊天文本</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#布朗语料库"><span class="post-toc-text">布朗语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#路透社语料库"><span class="post-toc-text">路透社语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#就职演说语料库"><span class="post-toc-text">就职演说语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#标注文本语料库"><span class="post-toc-text">标注文本语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#其他语言的语料库"><span class="post-toc-text">其他语言的语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#文本语料库的结构"><span class="post-toc-text">文本语料库的结构</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#载入你自己的语料库"><span class="post-toc-text">载入你自己的语料库</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-2-条件频率分布"><span class="post-toc-text">2.2 条件频率分布</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#条件和事件"><span class="post-toc-text">条件和事件</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#按文本计数词汇"><span class="post-toc-text">按文本计数词汇</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#绘制分布图和分布表"><span class="post-toc-text">绘制分布图和分布表</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#使用双联词生成随机文本"><span class="post-toc-text">使用双联词生成随机文本</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-3-更多关于-Python-代码重用-略"><span class="post-toc-text">2.3 更多关于 Python: 代码重用(略)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#使用文本编辑器创建程序"><span class="post-toc-text">使用文本编辑器创建程序</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#函数"><span class="post-toc-text">函数</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#模块"><span class="post-toc-text">模块</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-4-词典资源"><span class="post-toc-text">2.4 词典资源</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词汇列表语料库"><span class="post-toc-text">词汇列表语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#发音的词典"><span class="post-toc-text">发音的词典</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#比较词表"><span class="post-toc-text">比较词表</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词汇工具-Toolbox-和-Shoebox"><span class="post-toc-text">词汇工具:Toolbox 和 Shoebox</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-5-WordNet"><span class="post-toc-text">2.5 WordNet</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#意义与同义词"><span class="post-toc-text">意义与同义词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#WordNet-的层次结构"><span class="post-toc-text">WordNet 的层次结构</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#更多的词汇关系"><span class="post-toc-text">更多的词汇关系</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+
+<nav id="article-nav">
+  
+    <a href="/2019/05/06/Python-NLP-01/" id="article-nav-newer" class="article-nav-link-wrap">
+
+      <span class="article-nav-title">
+        <i class="fa fa-hand-o-left" aria-hidden="true"></i>
+        
+          Python自然语言处理01 语言处理与Python
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2019/05/06/Python-NLP-05/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Python自然语言处理05 分类和标注词汇</span>
+      <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+    </a>
+  
+</nav>
+
+
+
+    
+        <div id="SOHUCS" sid="Python-NLP-02"></div>
+<script type="text/javascript">
+    (function(){
+        var appid = 'cytRPCpOX';
+        var conf = 'prod_1e65dc7b851067d2e5fa952e667c6b16';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+    
+</section>
+        
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+      <p>
+        Powered by  <a href="http://hexo.io/" target="_blank">Hexo</a>
+        Theme <a href="//github.com/wongminho/hexo-theme-miho" target="_blank">MiHo</a>
+      &copy; 2019 ice-melt<br>
+      </p>
+    </div>
+  </div>
+</footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  var mihoConfig = {
+      root: "https://ice-melt.github.io",
+      animate: true,
+      isHome: false,
+      share: true,
+      reward: 1
+  }
+</script>
+<div class="sidebar">
+    <div id="sidebar-search" title="Search">
+        <i class="fa fa-search"></i>
+    </div>
+    <div id="sidebar-category" title="Categories">
+        <i class="fa fa-book"></i>
+    </div>
+    <div id="sidebar-tag" title="Tags">
+        <i class="fa fa-tags"></i>
+    </div>
+    <div id="sidebar-top">
+        <span class="sidebar-top-icon"><i class="fa fa-angle-up"></i></span>
+    </div>
+</div>
+<div class="sidebar-menu-box" id="sidebar-menu-box">
+    <div class="sidebar-menu-box-container">
+        <div id="sidebar-menu-box-categories">
+            
+        </div>
+        <div id="sidebar-menu-box-tags">
+            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+    <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
+</div>
+<div class="mobile-header-menu-nav" id="mobile-header-menu-nav">
+    <div class="mobile-header-menu-container">
+        <span class="title">Menus</span>
+        <ul class="mobile-header-menu-navbar">
+            
+            <li>
+                <a href="/">
+                    <i class="fa fa-home"></i><span>Home</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/archives">
+                    <i class="fa fa-archive"></i><span>Archives</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/about">
+                    <i class="fa fa-user"></i><span>About</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="mobile-header-tag-container">
+        <span class="title">Tags</span>
+        <div id="mobile-header-container-tags">
+            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+</div>
+<div class="search-wrap">
+    <span class="search-close">&times;</span>
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+            <i class="icon icon-lg icon-chevron-left"></i>
+        </a>
+        <input class="search-field" placeholder="Search..." id="keywords">
+        <a id="search-submit" href="javascript:;">
+            <i class="fa fa-search"></i>
+        </a>
+    <div class="search-container" id="search-container">
+        <ul class="search-result" id="search-result">
+        </ul>
+    </div>
+</div>
+
+<div id="search-tpl">
+    <li class="search-result-item">
+        <a href="{url}" class="search-item-li">
+            <span class="search-item-li-title" title="{title}">{title}</span>
+        </a>
+    </li>
+</div>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+
+
+  <script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles"></div>
+  <script src="/js/particles.js"></script>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  <script src="//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js"></script>
+  <script src="/js/animate.js"></script>
+
+
+  <script src="/js/pop-img.js"></script>
+  <script>
+     $(".article-entry p img").popImg();
+  </script>
+
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

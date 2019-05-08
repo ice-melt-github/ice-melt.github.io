@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Python自然语言处理01 语言处理与Python | 夕兮曦兮的个人网站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="keywords" content="ice-melt's Blog">
+  
+  <meta name="description" content="前言">
+<meta name="keywords" content="Python自然语言处理,NLP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python自然语言处理01 语言处理与Python">
+<meta property="og:url" content="https://ice-melt.github.io/2019/05/06/Python-NLP-01/index.html">
+<meta property="og:site_name" content="夕兮曦兮的个人网站">
+<meta property="og:description" content="前言">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-05-08T03:56:06.228Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python自然语言处理01 语言处理与Python">
+<meta name="twitter:description" content="前言">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/pace.min.js"></script>
+  
+
+  
+  
+
+  
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+</head>
+</html>
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+      <header id="header">
+    <div id="banner"></div>
+    <div id="header-outer">
+        <div id="header-menu" class="header-menu-pos animated">
+            <div class="header-menu-container">
+                <a href="/" class="left">
+                    <span class="site-title">ice-melt&#39;s Blog</span>
+                </a>
+                <nav id="header-menu-nav" class="right">
+                    
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    
+                    <a href="/archives">
+                        <i class="fa fa-archive"></i>
+                        <span>Archives</span>
+                    </a>
+                    
+                    <a href="/about">
+                        <i class="fa fa-user"></i>
+                        <span>About</span>
+                    </a>
+                    
+                </nav>
+                <a class="mobile-header-menu-button">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+        </div>
+        <div id="header-row">
+            <div id="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="header-info">
+                <div id="header-title">
+                    
+                    <h2>
+                        ice-melt&#39;s Blog
+                    </h2>
+                    
+                </div>
+                <div id="header-description">
+                    
+                    <h3>
+                        冰冻三尺 非一日之寒 积土成山 非斯须之作。
+                    </h3>
+                    
+                </div>
+            </div>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a title="ice-melt" target="_blank" href="https://ice-melt.github.io/">
+                            <i class="fa fa-home fa-2x"></i></a>
+                    
+                        <a title="Github" target="_blank" href="//github.com/ice-melt">
+                            <i class="fa fa-github fa-2x"></i></a>
+                    
+                        <a title="Weibo" target="_blank" href="//weibo.com/ice-melt">
+                            <i class="fa fa-weibo fa-2x"></i></a>
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+      <div class="outer">
+        <section id="main" class="body-wrap"><article id="post-Python-NLP-01" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="post-title" itemprop="name">
+      Python自然语言处理01 语言处理与Python
+    </h1>
+    <div class="post-title-bar">
+      <ul>
+          
+        <li>
+          <i class="fa fa-calendar"></i>  2019-05-06
+        </li>
+        <li>
+          <i class="fa fa-eye"></i>
+          <span id="busuanzi_value_page_pv"></span>
+        </li>
+      </ul>
+    </div>
+  
+
+          
+      </header>
+    
+    <div class="article-entry post-content" itemprop="articleBody">
+      
+            
+            <p>前言<br><a id="more"></a></p>
+<h3 id="1-1-语言计算-文本及词汇"><a href="#1-1-语言计算-文本及词汇" class="headerlink" title="1.1 语言计算:文本及词汇"></a>1.1 语言计算:文本及词汇</h3><h4 id="NLTK入门"><a href="#NLTK入门" class="headerlink" title="NLTK入门"></a>NLTK入门</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入及浏览下载软件包</span></span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line">nltk.download()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.book <span class="keyword">import</span> *</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">*** Introductory Examples for the NLTK Book ***</span></span><br><span class="line"><span class="string">Loading text1, ..., text9 and sent1, ..., sent9</span></span><br><span class="line"><span class="string">Type the name of the text or sentence to view it.</span></span><br><span class="line"><span class="string">Type: 'texts()' or 'sents()' to list the materials.</span></span><br><span class="line"><span class="string">text1: Moby Dick by Herman Melville 1851</span></span><br><span class="line"><span class="string">text2: Sense and Sensibility by Jane Austen 1811</span></span><br><span class="line"><span class="string">text3: The Book of Genesis</span></span><br><span class="line"><span class="string">text4: Inaugural Address Corpus</span></span><br><span class="line"><span class="string">text5: Chat Corpus</span></span><br><span class="line"><span class="string">text6: Monty Python and the Holy Grail</span></span><br><span class="line"><span class="string">text7: Wall Street Journal</span></span><br><span class="line"><span class="string">text8: Personals Corpus</span></span><br><span class="line"><span class="string">text9: The Man Who Was Thursday by G . K . Chesterton 1908</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">文本1:《白鲸记》-赫尔曼·梅尔维尔,1851年</span><br><span class="line">文本2:《感觉与情感》-简·奥斯汀,1811年</span><br><span class="line">文本3:创世纪之书</span><br><span class="line">文本4:就职演说语料库</span><br><span class="line">文本5:聊天语料库</span><br><span class="line">文本6:巨蟒和圣杯</span><br><span class="line">文本7:华尔街日报</span><br><span class="line">文本8:个人语料库</span><br><span class="line">文本9:《代号星期四》-切斯特顿,1908年</span><br></pre></td></tr></table></figure>
+<h4 id="搜索文本"><a href="#搜索文本" class="headerlink" title="搜索文本"></a>搜索文本</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找《白鲸记》中的词monstrous</span></span><br><span class="line">text1.concordance(<span class="string">"monstrous"</span>)</span><br><span class="line"><span class="comment"># 查找出现在相似上下文中的词</span></span><br><span class="line">text1.similar(<span class="string">"monstrous"</span>)</span><br><span class="line"><span class="comment"># 研究共用两个或两个以上词汇的上下文</span></span><br><span class="line">text1.common_contexts([<span class="string">"monstrous"</span>,<span class="string">"very"</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 画分布图需要引用 numpy 和 matplotlib</span></span><br><span class="line"><span class="comment"># 离散图表示从文本开头算起有多少词出现的位置信息</span></span><br><span class="line">text4.dispersion_plot([<span class="string">"citizens"</span>,<span class="string">"democracy"</span>,<span class="string">"freedom"</span>,<span class="string">"duties"</span>,<span class="string">"America"</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 产生相似风格的随机文本,标点符号和单词分开</span></span><br><span class="line">text3.generate()</span><br></pre></td></tr></table></figure>
+<h4 id="计数词汇"><a href="#计数词汇" class="headerlink" title="计数词汇"></a>计数词汇</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列表操作(计算长度,排序,去重,追加)</span></span><br><span class="line">len(text3)</span><br><span class="line">sorted(set(text3))	<span class="comment"># 大写字母出现在小写字母之前</span></span><br><span class="line">len(set(text3))</span><br><span class="line">text3.count(<span class="string">"smote"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-近观Python-将文本当做词链表"><a href="#1-2-近观Python-将文本当做词链表" class="headerlink" title="1.2 近观Python:将文本当做词链表"></a>1.2 近观Python:将文本当做词链表</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">text3+text4</span><br><span class="line">sent1.append(<span class="string">"Some"</span>)</span><br><span class="line"><span class="comment"># 索引列表,索引从0开始</span></span><br><span class="line">text4[<span class="number">173</span>]</span><br><span class="line">text4.index(<span class="string">'awaken'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-计算语言-简单的统计"><a href="#1-3-计算语言-简单的统计" class="headerlink" title="1.3 计算语言:简单的统计"></a>1.3 计算语言:简单的统计</h3><h4 id="频率分布"><a href="#频率分布" class="headerlink" title="频率分布"></a>频率分布</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fdist1=FreqDist(text1)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string"><span class="meta">&gt;&gt;&gt; </span>fdist1</span></span><br><span class="line"><span class="string">FreqDist(&#123;',': 18713, 'the': 13721, '.': 6862, 'of': 6536, 'and': 6024, 'a': 456</span></span><br><span class="line"><span class="string">9, 'to': 4542, ';': 4072, 'in': 3916, 'that': 2982, ...&#125;)</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">fdist1.plot(<span class="number">50</span>,cumulative=<span class="literal">True</span>) <span class="comment"># 前50个词的积累频率图</span></span><br><span class="line">vocabulary1=list(fdist1.keys()) <span class="comment"># 字典键值变列表</span></span><br><span class="line">vocabulary1[:<span class="number">50</span>]	<span class="comment"># 切片</span></span><br><span class="line">fdist1.hapaxes()	<span class="comment"># 只出现1词的词</span></span><br></pre></td></tr></table></figure>
+<h4 id="细粒度的选择词"><a href="#细粒度的选择词" class="headerlink" title="细粒度的选择词"></a>细粒度的选择词</h4><p>链表推导条件式<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">V = set(text1)</span><br><span class="line">long_words = [w <span class="keyword">for</span> w <span class="keyword">in</span> V <span class="keyword">if</span> len(w)&gt;<span class="number">15</span>]</span><br><span class="line"></span><br><span class="line">fdist5=FreqDist(text5)</span><br><span class="line">sorted([w <span class="keyword">for</span> w <span class="keyword">in</span> set(text5) <span class="keyword">if</span> len(w)&gt;<span class="number">7</span> <span class="keyword">and</span> fdist5[w]&gt;<span class="number">7</span>])</span><br></pre></td></tr></table></figure></p>
+<h4 id="词语搭配和双连词"><a href="#词语搭配和双连词" class="headerlink" title="词语搭配和双连词"></a>词语搭配和双连词</h4><p><strong>搭配</strong>是不经常在一起出现的词序列<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取词对</span></span><br><span class="line">bigrams([<span class="string">'more'</span>,<span class="string">'is'</span>,<span class="string">'said'</span>,<span class="string">'than'</span>,<span class="string">'done'</span>,<span class="string">'!'</span>])</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string"><span class="meta">&gt;&gt;&gt; </span>list(bigrams(['more','is','said','than','done','!']))</span></span><br><span class="line"><span class="string">[('more', 'is'), ('is', 'said'), ('said', 'than'), ('than', 'done'), ('done', '!')]</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="comment"># 找到出现频率比预期频率更频繁的双联词</span></span><br><span class="line">text4.collocations()</span><br></pre></td></tr></table></figure></p>
+<h4 id="计算其他东西"><a href="#计算其他东西" class="headerlink" title="计算其他东西"></a>计算其他东西</h4><p>除了计算词汇外,还可以计算词长等</p>
+<blockquote>
+<h5 id="表1-2-NLTK频率分布类中定义的函数"><a href="#表1-2-NLTK频率分布类中定义的函数" class="headerlink" title="表1-2   NLTK频率分布类中定义的函数"></a>表1-2   NLTK频率分布类中定义的函数</h5></blockquote>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">例子</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">fdist = FreqDist(text1)</td>
+<td style="text-align:left">创建包含给定样本的分布</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.inc(text1)</td>
+<td style="text-align:left">增加样本</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist[‘monstrous’]</td>
+<td style="text-align:left">计数给定样本出现的次数</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.freq(‘monstrous’)</td>
+<td style="text-align:left">给定样本的频率</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.N</td>
+<td style="text-align:left">样本总数</td>
+</tr>
+<tr>
+<td style="text-align:left">fdisk.keys()</td>
+<td style="text-align:left">以频率递减顺序排序的样本链表</td>
+</tr>
+<tr>
+<td style="text-align:left">for sample in fdist:</td>
+<td style="text-align:left">以频率递减的顺序遍历样本</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.max()</td>
+<td style="text-align:left">数值最大的样本</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.tabulate()</td>
+<td style="text-align:left">绘制频率分布表</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.plot()</td>
+<td style="text-align:left">绘制频率分布图</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist.plot(cumulative=True)</td>
+<td style="text-align:left">绘制积累频率分布图</td>
+</tr>
+<tr>
+<td style="text-align:left">fdist1&lt;fdist2</td>
+<td style="text-align:left">测试样本在fdist1中出现的频率是否小于fdist2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="1-4-回到Python-决策与控制"><a href="#1-4-回到Python-决策与控制" class="headerlink" title="1.4 回到Python:决策与控制"></a>1.4 回到Python:决策与控制</h3><blockquote>
+<h5 id="表1-3-数值比较运算符-略"><a href="#表1-3-数值比较运算符-略" class="headerlink" title="表1-3 数值比较运算符(略)"></a>表1-3 数值比较运算符(略)</h5><h5 id="表1-4-词汇比较运算符"><a href="#表1-4-词汇比较运算符" class="headerlink" title="表1-4 词汇比较运算符"></a>表1-4 词汇比较运算符</h5><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">函数</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">s.startswith(t)</td>
+<td style="text-align:left">测试s是否以t开头</td>
+</tr>
+<tr>
+<td style="text-align:left">s.endswith(t)</td>
+<td style="text-align:left">测试s是否以t结尾</td>
+</tr>
+<tr>
+<td style="text-align:left">t in s</td>
+<td style="text-align:left">测试s是否包含t</td>
+</tr>
+<tr>
+<td style="text-align:left">s.islower()</td>
+<td style="text-align:left">测试s中所有字符是否都是小写字母</td>
+</tr>
+<tr>
+<td style="text-align:left">s.isupper()</td>
+<td style="text-align:left">测试s中所有字符是否都是大写字母</td>
+</tr>
+<tr>
+<td style="text-align:left">s.isalpha()</td>
+<td style="text-align:left">测试s中所有字符是否都是字母</td>
+</tr>
+<tr>
+<td style="text-align:left">s.isalnum()</td>
+<td style="text-align:left">测试s中所有字符是否都是字母或数字</td>
+</tr>
+<tr>
+<td style="text-align:left">s.isdigit()</td>
+<td style="text-align:left">测试s中所有字符是否都是数字</td>
+</tr>
+<tr>
+<td style="text-align:left">s.istitle()</td>
+<td style="text-align:left">测试s是否首字母大写(s中的所有词都首字母大写)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</blockquote>
+<h4 id="对每个元素进行操作"><a href="#对每个元素进行操作" class="headerlink" title="对每个元素进行操作"></a>对每个元素进行操作</h4><p>处理</p>
+<ul>
+<li><p>链表推导</p>
+<ul>
+<li><code>[f(w) for ...]</code></li>
+<li><code>[w.f() for ...]</code></li>
+</ul>
+</li>
+<li><p>过滤字母,不区分大小写</p>
+<ul>
+<li><code>set([w.lower() for w in text1 if w.isalpha()])</code><h4 id="嵌套代码块-略"><a href="#嵌套代码块-略" class="headerlink" title="嵌套代码块(略)"></a>嵌套代码块(略)</h4><h4 id="条件循环-略"><a href="#条件循环-略" class="headerlink" title="条件循环(略)"></a>条件循环(略)</h4></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-5-自动理解自然语言"><a href="#1-5-自动理解自然语言" class="headerlink" title="1.5 自动理解自然语言"></a>1.5 自动理解自然语言</h3><h4 id="词义消歧"><a href="#词义消歧" class="headerlink" title="词义消歧"></a>词义消歧</h4><p>要分析出特定上下文中的词被赋予的是哪个意思</p>
+<h4 id="指代消解-anaphora-resolution"><a href="#指代消解-anaphora-resolution" class="headerlink" title="指代消解(anaphora resolution):"></a>指代消解(anaphora resolution):</h4><p>处理这个问题的计算技术包括:</p>
+<ul>
+<li>确定代词或名词指的是什么</li>
+<li>语义角色标注(semantic role labeling):确定名词短语如何与动词相关联(如代理、受事、工具等)</li>
+</ul>
+<h4 id="自动生成语言"><a href="#自动生成语言" class="headerlink" title="自动生成语言"></a>自动生成语言</h4><h4 id="机器翻译"><a href="#机器翻译" class="headerlink" title="机器翻译"></a>机器翻译</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">babelize_shell()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>文本对齐</strong>:自动配对组成句子的过程</p>
+</blockquote>
+<h4 id="人机对话系统"><a href="#人机对话系统" class="headerlink" title="人机对话系统"></a>人机对话系统</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nltk.chat.chatbots()</span><br></pre></td></tr></table></figure>
+<h4 id="文本的含义"><a href="#文本的含义" class="headerlink" title="文本的含义"></a>文本的含义</h4><p>文本含义识别(<code>Recognizing Textual Entailment,RTE</code>)</p>
+
+            <div class="post-copyright">
+    <div class="content">
+        <p>最后更新： 2019年05月08日 11:56</p>
+        <p>原始链接： <a class="post-url" href="/2019/05/06/Python-NLP-01/" title="Python自然语言处理01 语言处理与Python">https://ice-melt.github.io/2019/05/06/Python-NLP-01/</a></p>
+        <footer>
+            <a href="https://ice-melt.github.io">
+                <img src="/images/logo.png" alt="ice-melt">
+                ice-melt
+            </a>
+        </footer>
+    </div>
+</div>
+
+      
+        
+            
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;">赏</a>
+</div>
+
+<div id="reward" class="post-modal reward-lay">
+    <a class="close" href="javascript:;" id="reward-close">×</a>
+    <span class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        您的支持是我原创的动力
+        <i class="icon icon-quote-right"></i>
+    </span>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/images/wechat_code.jpg" alt="打赏二维码">
+        </div>
+        <div class="reward-select">
+            
+            <label class="reward-select-item checked" data-id="wechat" data-wechat="/images/wechat_code.jpg">
+                <img class="reward-select-item-wechat" src="/images/wechat.png" alt="微信">
+            </label>
+            
+            
+            <label class="reward-select-item" data-id="alipay" data-alipay="/images/alipay_code.jpg">
+                <img class="reward-select-item-alipay" src="/images/alipay.png" alt="支付宝">
+            </label>
+            
+        </div>
+    </div>
+</div>
+
+
+        
+    </div>
+    <footer class="article-footer">
+        
+        
+<div class="post-share">
+    <a href="javascript:;" id="share-sub" class="post-share-fab">
+        <i class="fa fa-share-alt"></i>
+    </a>
+    <div class="post-share-list" id="share-list">
+        <ul class="share-icons">
+          <li>
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/05/06/Python-NLP-01/&title=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+              <i class="fa fa-weibo"></i>
+            </a>
+          </li>
+          <li>
+            <a class="weixin share-sns" id="wxFab" href="javascript:;" data-title="微信">
+              <i class="fa fa-weixin"></i>
+            </a>
+          </li>
+          <li>
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/05/06/Python-NLP-01/&title=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&source=前言" data-title="QQ">
+              <i class="fa fa-qq"></i>
+            </a>
+          </li>
+          <li>
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/05/06/Python-NLP-01/" data-title="Facebook">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/05/06/Python-NLP-01/&via=https://ice-melt.github.io" data-title="Twitter">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/05/06/Python-NLP-01/" data-title="Google+">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        </ul>
+     </div>
+</div>
+<div class="post-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;" id="wxShare-close">×</a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/05/06/Python-NLP-01/" alt="微信分享二维码">
+</div>
+
+<div class="mask"></div>
+
+        
+        <ul class="article-footer-menu">
+            
+            
+  <li class="article-footer-tags">
+    <i class="fa fa-tags"></i>
+      
+    <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
+      
+    <a href="/tags/NLP/" class="color4">NLP</a>
+      
+  </li>
+
+        </ul>
+        
+    </footer>
+  </div>
+</article>
+
+
+    <aside class="post-toc-pos post-toc-top" id="post-toc">
+        <nav class="post-toc-wrap">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-1-语言计算-文本及词汇"><span class="post-toc-text">1.1 语言计算:文本及词汇</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NLTK入门"><span class="post-toc-text">NLTK入门</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#搜索文本"><span class="post-toc-text">搜索文本</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#计数词汇"><span class="post-toc-text">计数词汇</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-2-近观Python-将文本当做词链表"><span class="post-toc-text">1.2 近观Python:将文本当做词链表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-3-计算语言-简单的统计"><span class="post-toc-text">1.3 计算语言:简单的统计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#频率分布"><span class="post-toc-text">频率分布</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#细粒度的选择词"><span class="post-toc-text">细粒度的选择词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词语搭配和双连词"><span class="post-toc-text">词语搭配和双连词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#计算其他东西"><span class="post-toc-text">计算其他东西</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#表1-2-NLTK频率分布类中定义的函数"><span class="post-toc-text">表1-2   NLTK频率分布类中定义的函数</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-4-回到Python-决策与控制"><span class="post-toc-text">1.4 回到Python:决策与控制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#表1-3-数值比较运算符-略"><span class="post-toc-text">表1-3 数值比较运算符(略)</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#表1-4-词汇比较运算符"><span class="post-toc-text">表1-4 词汇比较运算符</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#对每个元素进行操作"><span class="post-toc-text">对每个元素进行操作</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#嵌套代码块-略"><span class="post-toc-text">嵌套代码块(略)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#条件循环-略"><span class="post-toc-text">条件循环(略)</span></a></li></ol><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-5-自动理解自然语言"><span class="post-toc-text">1.5 自动理解自然语言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词义消歧"><span class="post-toc-text">词义消歧</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#指代消解-anaphora-resolution"><span class="post-toc-text">指代消解(anaphora resolution):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#自动生成语言"><span class="post-toc-text">自动生成语言</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#机器翻译"><span class="post-toc-text">机器翻译</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#人机对话系统"><span class="post-toc-text">人机对话系统</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#文本的含义"><span class="post-toc-text">文本的含义</span></a></li></ol></li>
+        </nav>
+    </aside>
+    
+
+<nav id="article-nav">
+  
+    <a href="/2019/05/08/Python-NLP-07/" id="article-nav-newer" class="article-nav-link-wrap">
+
+      <span class="article-nav-title">
+        <i class="fa fa-hand-o-left" aria-hidden="true"></i>
+        
+          Python自然语言处理07 从文本提取信息
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2019/05/06/Python-NLP-02/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Python自然语言处理02 获得文本语料和词汇资源</span>
+      <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+    </a>
+  
+</nav>
+
+
+
+    
+        <div id="SOHUCS" sid="Python-NLP-01"></div>
+<script type="text/javascript">
+    (function(){
+        var appid = 'cytRPCpOX';
+        var conf = 'prod_1e65dc7b851067d2e5fa952e667c6b16';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+    
+</section>
+        
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+      <p>
+        Powered by  <a href="http://hexo.io/" target="_blank">Hexo</a>
+        Theme <a href="//github.com/wongminho/hexo-theme-miho" target="_blank">MiHo</a>
+      &copy; 2019 ice-melt<br>
+      </p>
+    </div>
+  </div>
+</footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  var mihoConfig = {
+      root: "https://ice-melt.github.io",
+      animate: true,
+      isHome: false,
+      share: true,
+      reward: 1
+  }
+</script>
+<div class="sidebar">
+    <div id="sidebar-search" title="Search">
+        <i class="fa fa-search"></i>
+    </div>
+    <div id="sidebar-category" title="Categories">
+        <i class="fa fa-book"></i>
+    </div>
+    <div id="sidebar-tag" title="Tags">
+        <i class="fa fa-tags"></i>
+    </div>
+    <div id="sidebar-top">
+        <span class="sidebar-top-icon"><i class="fa fa-angle-up"></i></span>
+    </div>
+</div>
+<div class="sidebar-menu-box" id="sidebar-menu-box">
+    <div class="sidebar-menu-box-container">
+        <div id="sidebar-menu-box-categories">
+            
+        </div>
+        <div id="sidebar-menu-box-tags">
+            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+    <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
+</div>
+<div class="mobile-header-menu-nav" id="mobile-header-menu-nav">
+    <div class="mobile-header-menu-container">
+        <span class="title">Menus</span>
+        <ul class="mobile-header-menu-navbar">
+            
+            <li>
+                <a href="/">
+                    <i class="fa fa-home"></i><span>Home</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/archives">
+                    <i class="fa fa-archive"></i><span>Archives</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/about">
+                    <i class="fa fa-user"></i><span>About</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="mobile-header-tag-container">
+        <span class="title">Tags</span>
+        <div id="mobile-header-container-tags">
+            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+</div>
+<div class="search-wrap">
+    <span class="search-close">&times;</span>
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+            <i class="icon icon-lg icon-chevron-left"></i>
+        </a>
+        <input class="search-field" placeholder="Search..." id="keywords">
+        <a id="search-submit" href="javascript:;">
+            <i class="fa fa-search"></i>
+        </a>
+    <div class="search-container" id="search-container">
+        <ul class="search-result" id="search-result">
+        </ul>
+    </div>
+</div>
+
+<div id="search-tpl">
+    <li class="search-result-item">
+        <a href="{url}" class="search-item-li">
+            <span class="search-item-li-title" title="{title}">{title}</span>
+        </a>
+    </li>
+</div>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+
+
+  <script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles"></div>
+  <script src="/js/particles.js"></script>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  <script src="//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js"></script>
+  <script src="/js/animate.js"></script>
+
+
+  <script src="/js/pop-img.js"></script>
+  <script>
+     $(".article-entry p img").popImg();
+  </script>
+
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
