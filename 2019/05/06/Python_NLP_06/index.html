@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Python自然语言处理06 学习分类文本 | 夕兮曦兮的个人网站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="keywords" content="ice-melt's Blog">
+  
+  <meta name="description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
+<meta name="keywords" content="Python自然语言处理,NLP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python自然语言处理06 学习分类文本">
+<meta property="og:url" content="https://ice-melt.github.io/2019/05/06/Python_NLP_06/index.html">
+<meta property="og:site_name" content="夕兮曦兮的个人网站">
+<meta property="og:description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190506154303588.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-05-08T03:19:15.689Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python自然语言处理06 学习分类文本">
+<meta name="twitter:description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190506154303588.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/pace.min.js"></script>
+  
+
+  
+  
+
+  
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+</head>
+</html>
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+      <header id="header">
+    <div id="banner"></div>
+    <div id="header-outer">
+        <div id="header-menu" class="header-menu-pos animated">
+            <div class="header-menu-container">
+                <a href="/" class="left">
+                    <span class="site-title">ice-melt&#39;s Blog</span>
+                </a>
+                <nav id="header-menu-nav" class="right">
+                    
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    
+                    <a href="/archives">
+                        <i class="fa fa-archive"></i>
+                        <span>Archives</span>
+                    </a>
+                    
+                    <a href="/about">
+                        <i class="fa fa-user"></i>
+                        <span>About</span>
+                    </a>
+                    
+                </nav>
+                <a class="mobile-header-menu-button">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+        </div>
+        <div id="header-row">
+            <div id="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="header-info">
+                <div id="header-title">
+                    
+                    <h2>
+                        ice-melt&#39;s Blog
+                    </h2>
+                    
+                </div>
+                <div id="header-description">
+                    
+                    <h3>
+                        冰冻三尺 非一日之寒 积土成山 非斯须之作。
+                    </h3>
+                    
+                </div>
+            </div>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a title="ice-melt" target="_blank" href="https://ice-melt.github.io/">
+                            <i class="fa fa-home fa-2x"></i></a>
+                    
+                        <a title="Github" target="_blank" href="//github.com/ice-melt">
+                            <i class="fa fa-github fa-2x"></i></a>
+                    
+                        <a title="Weibo" target="_blank" href="//weibo.com/ice-melt">
+                            <i class="fa fa-weibo fa-2x"></i></a>
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+      <div class="outer">
+        <section id="main" class="body-wrap"><article id="post-Python_NLP_06" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="post-title" itemprop="name">
+      Python自然语言处理06 学习分类文本
+    </h1>
+    <div class="post-title-bar">
+      <ul>
+          
+        <li>
+          <i class="fa fa-calendar"></i>  2019-05-06
+        </li>
+        <li>
+          <i class="fa fa-eye"></i>
+          <span id="busuanzi_value_page_pv"></span>
+        </li>
+      </ul>
+    </div>
+  
+
+          
+      </header>
+    
+    <div class="article-entry post-content" itemprop="articleBody">
+      
+            
+            <p>模式识别是自然语言处理的一个核心部分.</p>
+<blockquote>
+<p>以-ed结尾的词往往是过去时态动词(ref 5 chapter)</p>
+<p>频繁使用will暗示这是新闻文本(ref 3 chapter)</p>
+</blockquote>
+<p>可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等.</p>
+<p>我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联?</p>
+<p>本章回答如下问题:</p>
+<ol>
+<li>怎样识别语言数据中明显用于分类的特征?</li>
+<li>怎样构建用于自动执行语言处理任务的语言模型?</li>
+<li>从这些模型中可以学到哪些关于语言的知识?</li>
+</ol>
+<p>决策树，朴素贝叶斯分类器和最大熵分类<br><a id="more"></a></p>
+<h3 id="6-1-监督式分类"><a href="#6-1-监督式分类" class="headerlink" title="6.1 监督式分类"></a>6.1 监督式分类</h3><p><strong>分类</strong>是为给定的输入选择正确的<strong>类标签</strong></p>
+<ul>
+<li>多样分类中,每个实例可以分配多个标签</li>
+<li>开放性分类中,标签集是事先没有定义的</li>
+<li>序列分类中,将输入链表作为整体分类</li>
+</ul>
+<p>建立在训练语料基础之上的分类,叫做<strong>监督式分类</strong></p>
+<p>文本分类器帮助下执行任务的代表性例子:</p>
+<h4 id="性别鉴定"><a href="#性别鉴定" class="headerlink" title="性别鉴定"></a>性别鉴定</h4><p>创建分类器的第一步是决定什么样的输入特征是相关的,以及如何为这些特征编码.</p>
+<p>在names语料库中,可以发现男性和女性的名字中,以a、e和i结尾的name很可能是女性,<br>而以k、o、r和s结尾的name很可能是男性.所以特征提取器可以从寻找给定名称的最后一个字母开始.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 函数返回的字典-特征集,能把特征名称影射到它们的值.</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gender_features</span><span class="params">(word)</span>:</span></span><br><span class="line">	<span class="comment"># 特征名称是区分大小写的字符串,通常提供一个简短可读的特征描述</span></span><br><span class="line">	<span class="comment"># 特征值是简单类型的值,如布尔、数字和字符串.</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">'last_letter'</span>: word[<span class="number">-1</span>]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>定义一个特征提取器,同事准备一些例子和与其对应的类标签<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> names</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">names = ([(name, <span class="string">'male'</span>) <span class="keyword">for</span> name <span class="keyword">in</span> names.words(<span class="string">'male.txt'</span>)] +</span><br><span class="line">         [(name, <span class="string">'female'</span>) <span class="keyword">for</span> name <span class="keyword">in</span> names.words(<span class="string">'female.txt'</span>)])</span><br><span class="line">random.shuffle(names)</span><br></pre></td></tr></table></figure></p>
+<p>使用特征提取器处理数据,并将结果链表分割成训练集和测试集.使用训练集进行训练(朴素贝叶斯分类器)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">featuresets = [(gender_features(n), g) <span class="keyword">for</span> (n, g) <span class="keyword">in</span> names]</span><br><span class="line">train_set, test_set = featuresets[<span class="number">500</span>:], featuresets[:<span class="number">500</span>]</span><br><span class="line"><span class="comment"># 贝叶斯分类器训练</span></span><br><span class="line">classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br></pre></td></tr></table></figure></p>
+<p>预测(使用一些没有出现在训练数据中的名字)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(clsfir, nm)</span>:</span></span><br><span class="line">    lbl = clsfir.classify(gender_features(nm))</span><br><span class="line">    print(<span class="string">'%s预测为%s'</span> % (nm, lbl))</span><br><span class="line">    <span class="keyword">return</span> lbl</span><br><span class="line"></span><br><span class="line">predict(classifier, <span class="string">'Neo'</span>)</span><br><span class="line">predict(classifier, <span class="string">'Trinity'</span>)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">Neo预测为male</span></span><br><span class="line"><span class="string">Trinity预测为female</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>利用大量未见过的数据系统的评估这个分类器<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">evaluation</span><span class="params">(clsfir, tst_set)</span>:</span></span><br><span class="line">    acc = nltk.classify.accuracy(clsfir, tst_set)</span><br><span class="line">    print(<span class="string">'测试集的精度为%4f'</span> % acc)</span><br><span class="line">    <span class="keyword">return</span> acc</span><br><span class="line"></span><br><span class="line">evaluation(classifier, test_set)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">测试集的精度为0.768000</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>最后检查分类器,确定哪些特征对于区分名字性别时最有效的<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">classifier.show_most_informative_features(<span class="number">5</span>)</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">Most Informative Features</span></span><br><span class="line"><span class="string">             last_letter = 'a'            female : male   =     34.2 : 1.0</span></span><br><span class="line"><span class="string">             last_letter = 'k'              male : female =     33.0 : 1.0</span></span><br><span class="line"><span class="string">             last_letter = 'f'              male : female =     17.4 : 1.0</span></span><br><span class="line"><span class="string">             last_letter = 'p'              male : female =     11.3 : 1.0</span></span><br><span class="line"><span class="string">             last_letter = 'm'              male : female =     11.2 : 1.0</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>处理大型语料库时,构建包含所有实例特征的单独链表会占用大量的内存.此时<br>使用函数 <code>nltk.classify.apply_featurs</code>,返回一个像链表但不会在内存存储所有特征集的对象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.classify <span class="keyword">import</span> apply_features</span><br><span class="line"></span><br><span class="line">train_set = apply_features(gender_features, names[<span class="number">500</span>:])</span><br><span class="line">test_set = apply_features(gender_features, names[:<span class="number">500</span>])</span><br></pre></td></tr></table></figure>
+<h4 id="选择正确的特征"><a href="#选择正确的特征" class="headerlink" title="选择正确的特征"></a>选择正确的特征</h4><p>建立分类器的工作之一是找出哪些特征可能是相关的,以及如何表示他们</p>
+<p>一般的,特征提取是在反复试验和错误的过程中建立的,那些信息与问题相关,是通过直觉来引导的.<br>它通常以”激进现实主义”的方法开始,包括你能想到的所有特征,然后检查哪些特征是实际有用的</p>
+<p>下面代码展示的特征提取器采取了这种做法:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 特征集包含大量的指定特征,导致相对较小的名字语料库产生了过拟合</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gender_features</span><span class="params">(name)</span>:</span></span><br><span class="line">    features = dict()</span><br><span class="line">    features[<span class="string">"firstletter"</span>] = name[<span class="number">0</span>].lower()</span><br><span class="line">    features[<span class="string">"lastletter"</span>] = name[<span class="number">-1</span>].lower()</span><br><span class="line">    <span class="keyword">for</span> letter <span class="keyword">in</span> <span class="string">'abcdefghigklmnopqrstuvwxyz'</span>:</span><br><span class="line">        features[<span class="string">"count(%s)"</span> % letter] = name.lower().count(letter)</span><br><span class="line">        features[<span class="string">"has(%s)"</span> % letter] = (letter <span class="keyword">in</span> name.lower())</span><br><span class="line">    <span class="keyword">return</span> features</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">测试集的精度为0.758000</span></span><br><span class="line"><span class="string">Most Informative Features</span></span><br><span class="line"><span class="string">              lastletter = 'a'            female : male   =     36.8 : 1.0</span></span><br><span class="line"><span class="string">              lastletter = 'k'              male : female =     29.9 : 1.0</span></span><br><span class="line"><span class="string">              lastletter = 'f'              male : female =     17.3 : 1.0</span></span><br><span class="line"><span class="string">              lastletter = 'p'              male : female =     11.9 : 1.0</span></span><br><span class="line"><span class="string">              lastletter = 'v'              male : female =     10.5 : 1.0</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>所用的给定的学习算法的特征数目是有限的,如果提供太多的特征,那么该算法将高度依赖训练数据而对一般化的新例子不起作用(此问题称为过拟合).</p>
+<blockquote>
+<p>本地多次运行,使用后一个特征提取器结果往往优于第一个,这里作者应该只是为了说明此种现象</p>
+</blockquote>
+<p>选定初始特征集,一种能有效完善特征集的方法称为<strong>错误分析</strong>.首先选择<strong>开发集</strong>(包含用于创建模型的语料数据),然后将这种开发集分为<strong>训练集</strong>和<strong>开发测试集</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20190506154303588.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_names = names[<span class="number">1500</span>:]      <span class="comment"># 训练集用于训练模型</span></span><br><span class="line">devtest_names = names[<span class="number">500</span>:<span class="number">1500</span>] <span class="comment"># 开发测试集用于执行错误分析</span></span><br><span class="line">test_names = names[:<span class="number">500</span>]        <span class="comment"># 测试集用于系统的最终评估</span></span><br></pre></td></tr></table></figure>
+<p>将语料分为适当的数据集,使用训练集来训练模型,在开发测试集上运行,这样可以生成分类器在预测名字性别时出现的错误列表.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">train_set = [(gender_features(n), g) <span class="keyword">for</span> (n, g) <span class="keyword">in</span> train_names]</span><br><span class="line">devtest_set = [(gender_features(n), g) <span class="keyword">for</span> (n, g) <span class="keyword">in</span> devtest_names]</span><br><span class="line">test_set = [(gender_features(n), g) <span class="keyword">for</span> (n, g) <span class="keyword">in</span> test_names]</span><br><span class="line">classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br><span class="line">evaluation(classifier, devtest_set)</span><br><span class="line"><span class="comment"># 使用开发测试集生成分类器在预测名字性别时出现的错误列表</span></span><br><span class="line">errors = []</span><br><span class="line"><span class="keyword">for</span> (name, tag) <span class="keyword">in</span> devtest_names:</span><br><span class="line">    guess = classifier.classify(gender_features(name))</span><br><span class="line">    <span class="keyword">if</span> guess != tag:</span><br><span class="line">        errors.append((tag, guess, name))</span><br><span class="line"><span class="keyword">for</span> (tag, guess, name) <span class="keyword">in</span> sorted(errors):</span><br><span class="line">    print(<span class="string">'correct=%-8s guess=%-8s name=%-30s'</span> % (tag, guess, name))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Cathryn                       </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Coralyn                       </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Daryn                         </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Ellyn                         </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Eryn                          </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Jaquelyn                      </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Jessalyn                      </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Kristyn                       </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Madalyn                       </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Robbyn                        </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Roselyn                       </span></span><br><span class="line"><span class="string">correct=female   guess=male     name=Taryn                         </span></span><br><span class="line"><span class="string">correct=male     guess=female   name=Aldrich                       </span></span><br><span class="line"><span class="string">correct=male     guess=female   name=Dietrich                      </span></span><br><span class="line"><span class="string">correct=male     guess=female   name=Frederich                     </span></span><br><span class="line"><span class="string">correct=male     guess=female   name=Rich </span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<p>通过分析错误列表,可以发现某些多字母后缀也可以指示名字性别,如<code>yn</code>,<code>ch</code>等<br>所以可以调整特征提取器使其包含两个字母的后缀的特征<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gender_features</span><span class="params">(word)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">'suffix1'</span>: word[<span class="number">-1</span>:],</span><br><span class="line">            <span class="string">'suffix2'</span>: word[<span class="number">-2</span>:]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>错误分析的过程可以不断重复,检查由于新改进的分类器导致某些错误产生的模式.<br>每次错误分析应该选择一个不同的开发测试/训练分割,以确保该分类器不会反映开发测试集的特质</p>
+<p>使用开发测试集来帮助开发模型,关于模型在新数据会表现多好的问题上,它将无法给出一个准确的结果,所以一定要保持测试集分离、未使用过,直到模型开发完毕.</p>
+<h4 id="文档分类"><a href="#文档分类" class="headerlink" title="文档分类"></a>文档分类</h4><p>首先构造已标记类别的文档清单,例子中选择电影评论语料库,将每个评论归类为正面或负面.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> movie_reviews</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">documents = [(list(movie_reviews.words(fileid)), category)</span><br><span class="line">             <span class="keyword">for</span> category <span class="keyword">in</span> movie_reviews.categories()</span><br><span class="line">             <span class="keyword">for</span> fileid <span class="keyword">in</span> movie_reviews.fileids(category)]</span><br><span class="line">random.shuffle(documents)</span><br></pre></td></tr></table></figure></p>
+<p>然后为文档定义特征提取器,这样分类器就会知道应注意哪些方面的数据.<br>对于文档主题识别,可以为每个词定义一个特性以表示该文档是否包含这个词.</p>
+<blockquote>
+<p>特别的,为了限制分类器需要处理的特征数目,构建整个语料库中前2000个最频繁词的链表</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">all_words = nltk.FreqDist(w.lower() <span class="keyword">for</span> w <span class="keyword">in</span> movie_reviews.words())</span><br><span class="line">word_features = list(all_words.keys())[:<span class="number">2000</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个特征提取器,简单地检查这些词是否在一个给定的文档中</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">document_features</span><span class="params">(document)</span>:</span></span><br><span class="line">    document_words = set(document)</span><br><span class="line">    features = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> word <span class="keyword">in</span> word_features:</span><br><span class="line">        features[<span class="string">'contains(%s)'</span> % word] = (word <span class="keyword">in</span> document_words)</span><br><span class="line">    <span class="keyword">return</span> features</span><br><span class="line"></span><br><span class="line">print(document_features(movie_reviews.words(<span class="string">'pos/cv957_8737.txt'</span>)))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">&#123;'contains(plot)': True, 'contains(:)': True, 'contains(two)': True, </span></span><br><span class="line"><span class="string">'contains(teen)': False, 'contains(couples)': False, 'contains(go)': False, ...&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<p>现在,使用定义的特征提取器来训练分类器,并为新的电影评论加标签.<br>在测试集上计算其准确性来检查生成的分类器可靠性如何.同时,还可以查看那些<br>特征是分类器发现的并且是最有信息量的<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 训练和测试分类器以进行文档分类</span></span><br><span class="line">featuresets = [(document_features(d), c) <span class="keyword">for</span> (d, c) <span class="keyword">in</span> documents]</span><br><span class="line">train_set, test_set = featuresets[<span class="number">100</span>:], featuresets[:<span class="number">100</span>]</span><br><span class="line">classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br><span class="line">print(nltk.classify.accuracy(classifier, test_set))</span><br><span class="line">classifier.show_most_informative_features()</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">0.83</span></span><br><span class="line"><span class="string">Most Informative Features</span></span><br><span class="line"><span class="string"> contains(unimaginative) = True              neg : pos    =      8.5 : 1.0</span></span><br><span class="line"><span class="string">        contains(sexist) = True              neg : pos    =      7.8 : 1.0</span></span><br><span class="line"><span class="string">    contains(schumacher) = True              neg : pos    =      7.5 : 1.0</span></span><br><span class="line"><span class="string">          contains(mena) = True              neg : pos    =      7.1 : 1.0</span></span><br><span class="line"><span class="string">     contains(atrocious) = True              neg : pos    =      7.1 : 1.0</span></span><br><span class="line"><span class="string">        contains(suvari) = True              neg : pos    =      7.1 : 1.0</span></span><br><span class="line"><span class="string">        contains(turkey) = True              neg : pos    =      6.9 : 1.0</span></span><br><span class="line"><span class="string">        contains(shoddy) = True              neg : pos    =      6.4 : 1.0</span></span><br><span class="line"><span class="string">       contains(singers) = True              pos : neg    =      6.2 : 1.0</span></span><br><span class="line"><span class="string">     contains(underwood) = True              neg : pos    =      5.8 : 1.0</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="词性标注"><a href="#词性标注" class="headerlink" title="词性标注"></a>词性标注</h4><p>第5章中建立了一个正则表达式标注器,通过查找词内部的组成,为词选择词性标记.<br>但是这个正则表达式标注器是手工标注的.<br>可以训练一个分类器来算出哪个后缀最有信息量<br>首先,找出最常见的后缀<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> brown</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">suffix_fdist = nltk.FreqDist()</span><br><span class="line"><span class="comment"># 找出最常见的后缀</span></span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> brown.words():</span><br><span class="line">    word = word.lower()</span><br><span class="line">    suffix_fdist[word[<span class="number">-1</span>:]] += <span class="number">1</span></span><br><span class="line">    suffix_fdist[word[<span class="number">-2</span>:]] += <span class="number">1</span></span><br><span class="line">    suffix_fdist[word[<span class="number">-3</span>:]] += <span class="number">1</span></span><br><span class="line">common_suffixes = list(suffix_fdist.keys())[:<span class="number">100</span>]</span><br></pre></td></tr></table></figure></p>
+<p>然后定义一个特征提取器用来检查给定单词的后缀.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pos_features</span><span class="params">(word)</span>:</span></span><br><span class="line">    features = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> suffix <span class="keyword">in</span> common_suffixes:</span><br><span class="line">        features[<span class="string">'endswith(%s)'</span> % suffix] = word.lower().endswith(suffix)</span><br><span class="line">    <span class="keyword">return</span> features</span><br></pre></td></tr></table></figure></p>
+<p>特征提取函数的行为就想有色玻璃一样,强调数据中的某些属性,并使其无法看到其他属性.<br>分类器在决定如何标记输入时,将完全依赖它们所强调的属性.<br>此时分类器将只基于给定词拥有的(如果有)常见后缀来作决定.</p>
+<p>现在用特征提取器来训练新的”决策树”分类器(ref 6.4)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tagged_words = brown.tagged_words(categories=<span class="string">'news'</span>)</span><br><span class="line">featuresets = [(pos_features(n), g) <span class="keyword">for</span> n, g <span class="keyword">in</span> tagged_words]</span><br><span class="line">size = int(len(featuresets) * <span class="number">0.1</span>)</span><br><span class="line">train_set, test_set = featuresets[size:], featuresets[:size]</span><br><span class="line">classifier = nltk.DecisionTreeClassifier.train(train_set)</span><br><span class="line"></span><br><span class="line">print(nltk.classify.accuracy(classifier, test_set))	<span class="comment"># 0.5689706613625062</span></span><br><span class="line">print(classifier.classify(pos_features(<span class="string">'cats'</span>)))	<span class="comment"># NNS</span></span><br></pre></td></tr></table></figure></p>
+<p>决策树模型的优点是容易解释,NLTK可以将它们以伪代码的形式输出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># depth=4,只显示决策树的前4层</span></span><br><span class="line">print(classifier.pseudocode(depth=<span class="number">4</span>))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">if endswith(the) == False: </span></span><br><span class="line"><span class="string">  if endswith(,) == False: </span></span><br><span class="line"><span class="string">    if endswith(s) == False: </span></span><br><span class="line"><span class="string">      if endswith(.) == False: return '.'</span></span><br><span class="line"><span class="string">      if endswith(.) == True: return '.'</span></span><br><span class="line"><span class="string">    if endswith(s) == True: </span></span><br><span class="line"><span class="string">      if endswith(was) == False: return 'PP$'</span></span><br><span class="line"><span class="string">      if endswith(was) == True: return 'BEDZ'</span></span><br><span class="line"><span class="string">  if endswith(,) == True: return ','</span></span><br><span class="line"><span class="string">if endswith(the) == True: return 'AT'</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<h4 id="探索上下文语境"><a href="#探索上下文语境" class="headerlink" title="探索上下文语境"></a>探索上下文语境</h4><p>通过增加特征提取函数,可以修改词性标注器以利用各种词内部的其他特征(词长,所包含的音节数,前缀等).<br>但是只要特征提取器仅关注目标词,就无法添加依赖于词所出现的上下文语境的特征.</p>
+<p>语境特征通常提供关于标记的强线索,如标注词<code>fly</code>时,如果知道它前面的词是<code>a</code>,能够确定它是名词而不是动词.</p>
+<p>为了应用基于词的上下文这个特征,就不能只传递已标注的词,而是传递整个(未标注)句子,以及目标词的索引.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def pos_features(sentence, i):</span><br><span class="line">    features = &#123;&apos;suffix(1)&apos;: sentence[i][-1:],</span><br><span class="line">                &apos;suffix(2)&apos;: sentence[i][-2:],</span><br><span class="line">                &apos;suffix(3)&apos;: sentence[i][-3:]&#125;</span><br><span class="line">    if i == 0:</span><br><span class="line">        features[&quot;prev-word&quot;] = &quot;&lt;START&gt;&quot;</span><br><span class="line">    else:</span><br><span class="line">        features[&apos;prev-word&apos;] = sentence[i - 1]</span><br><span class="line">    return features</span><br></pre></td></tr></table></figure></p>
+<p>使用依赖上下文的特征提取器来定义一个词性标记分类器,它的特征检测器检查一个词的上下文以便决定应该分配哪个词性标记(前面的词也作为特征)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tagged_sents = brown.tagged_sents(categories=&apos;news&apos;)</span><br><span class="line">featuresets = []</span><br><span class="line">for tagged_sent in tagged_sents:</span><br><span class="line">    untagged_sent = nltk.tag.untag(tagged_sent)</span><br><span class="line">    for i, (word, tag) in enumerate(tagged_sent):</span><br><span class="line">        featuresets.append((pos_features(untagged_sent, i), tag))</span><br><span class="line"></span><br><span class="line">size = int(len(featuresets) * 0.1)</span><br><span class="line">train_set, test_set = featuresets[size:], featuresets[:size]</span><br><span class="line">classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br><span class="line">print(nltk.classify.accuracy(classifier, test_set))</span><br><span class="line"># 0.7891596220785678</span><br></pre></td></tr></table></figure></p>
+<p>利用上下文特征能提高词性标注器的性能,但是它无法研究一般情况(形容词后很可能是名词,但是这个名词无法获得前面这个词的词性标记).<br>在一般情况下,简单的分类器总是将每一个输入与所有其他输入独立对待,但是很多情况中(如词性标注),关注的是如何解决分类问题</p>
+<h4 id="序列分类"><a href="#序列分类" class="headerlink" title="序列分类"></a>序列分类</h4><p>获取相关分类任务之间的依赖关系,可以使用<strong>联合分类器</strong>模型为一些相关的输入选择适当的标签</p>
+<p>在词性标注的例子中,可以使用不同的<strong>序列分类器</strong>模型为给定的句子中的所有词选择词性标签</p>
+<p><strong>连续分类</strong> 或 <strong>贪婪序列分类</strong> 的序列分类器策略做法如下:</p>
+<p>为第一个输入找到最有可能的类标签,然后在此基础上找到下一个输入的最佳标签.<br>这个过程可以不断重复,直到所有的输入都被贴上标签</p>
+<p>以下示例代码中,首先扩展特征提取函数使其具有参数history,其中包含以及为句子预测的标记链表.<br>history中的每个标记对应sentence中的一个词(只包含已经归类的词的标记,即目标词左侧的词)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pos_features</span><span class="params">(sentence, i, history)</span>:</span></span><br><span class="line">    features = &#123;<span class="string">'suffix(1)'</span>: sentence[i][<span class="number">-1</span>:],</span><br><span class="line">                <span class="string">'suffix(2)'</span>: sentence[i][<span class="number">-2</span>:],</span><br><span class="line">                <span class="string">'suffix(3)'</span>: sentence[i][<span class="number">-3</span>:]&#125;</span><br><span class="line">    <span class="keyword">if</span> i == <span class="number">0</span>:</span><br><span class="line">        features[<span class="string">"prev-word"</span>] = <span class="string">"&lt;START&gt;"</span></span><br><span class="line">        features[<span class="string">"prev-tag"</span>] = <span class="string">"&lt;START&gt;"</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        features[<span class="string">'prev-word'</span>] = sentence[i - <span class="number">1</span>]</span><br><span class="line">        features[<span class="string">"prev-tag"</span>] = history[i - <span class="number">1</span>]</span><br><span class="line">    <span class="keyword">return</span> features</span><br></pre></td></tr></table></figure></p>
+<p>定义特征提取器,继续建立序列分类器.在训练中,使用已标注的标记为特征提取器提供适当的历史信息,但标注新的句子时,基于标注器本身的输出来产生历史信息<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConsecutivePosTagger</span><span class="params">(nltk.TaggerI)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, train_sents)</span>:</span></span><br><span class="line">        train_set = []</span><br><span class="line">        <span class="keyword">for</span> tagged_sent <span class="keyword">in</span> train_sents:</span><br><span class="line">            untagged_sent = nltk.tag.untag(tagged_sent)</span><br><span class="line">            history = []</span><br><span class="line">            <span class="keyword">for</span> i, (word, tag) <span class="keyword">in</span> enumerate(tagged_sent):</span><br><span class="line">                featureset = pos_features(untagged_sent, i, history)</span><br><span class="line">                train_set.append((featureset, tag))</span><br><span class="line">                history.append(tag)</span><br><span class="line">            self.classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tag</span><span class="params">(self, sentence)</span>:</span></span><br><span class="line">        history = []</span><br><span class="line">        <span class="keyword">for</span> i, word <span class="keyword">in</span> enumerate(sentence):</span><br><span class="line">            featureset = pos_features(sentence, i, history)</span><br><span class="line">            tag = self.classifier.classify(featureset)</span><br><span class="line">            history.append(tag)</span><br><span class="line">        <span class="keyword">return</span> zip(sentence, history)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">tagged_sents = brown.tagged_sents(categories=<span class="string">'news'</span>)</span><br><span class="line">size = int(len(tagged_sents) * <span class="number">0.1</span>)</span><br><span class="line">train_sents, test_sents = tagged_sents[size:], tagged_sents[:size]</span><br><span class="line">tagger = ConsecutivePosTagger(train_sents)</span><br><span class="line">print(tagger.evaluate(test_sents))</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">0.7980528511821975</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="其他序列分类方法"><a href="#其他序列分类方法" class="headerlink" title="其他序列分类方法"></a>其他序列分类方法</h4><p>序列分类的缺点是一旦做出决定便无法更改.例如决定将一个词标注为名词,但是后来发现应该是动词,那也没有办法修复此错误.<br>解决这个问题的方案:</p>
+<ol>
+<li><p>采用<strong>转型策略</strong></p>
+<p> <strong>转型联合分类</strong>的工作原理是为输入的标签创建一个初始值,然后反复提炼该值,尝试修复相关输入之间的不一致.(e.g. ref 5.6 Brill标注器)</p>
+</li>
+<li><p>为词性标记的所有可能的序列打分,选择总得分最高的序列.</p>
+<p> <strong>隐马尔可夫模型</strong>采取了这种方法</p>
+<p> 隐马尔可夫模型类似于连续分类器,不光考虑输入也考虑已预测标记的历史,但不是简单的找出一个给定词的单个最好标记,<br> 而是为标记产生一个概率分布.然后将这些概率结合起来计算标记序列的概率得分,最后选择最高概率的标记序列.</p>
+<blockquote>
+<p>问题:可能的标签序列数量很多.给定包含30个标签的标记集,大约有600万亿(30^10)种方式来标记一个10个词的句子.<br>为了避免单独考虑所有这些可能的序列,隐马尔可夫模型要求特征提取器只考虑最近的标记(或最近的n个标记,n很小)<br>由于这种限制,它可以使用动态规划来有效的找出最有可能的标记序列.<br>特别的,对于每个连续的词索引i,当前的及以前的每个可能的标记都将计算得分.这种基础的方法被<strong>最大熵马尔科夫模型</strong><br>和<strong>线性链条件随机场模型</strong>所采用(为标记序列打分用的是不同的算法)</p>
+<h3 id="6-2-监督式分类的举例"><a href="#6-2-监督式分类的举例" class="headerlink" title="6.2 监督式分类的举例"></a>6.2 监督式分类的举例</h3></blockquote>
+</li>
+</ol>
+<h4 id="句子分割"><a href="#句子分割" class="headerlink" title="句子分割"></a>句子分割</h4><p>句子分割可以看做是标点符号的分类任务:每当遇到可能会结束句子的符号时(如句号或问好),必须决定它是否终止了当前句子</p>
+<p>第一步是获取一些已被分割成句子的数据,将它转换成一种适合提取特征的形式</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">sents = nltk.corpus.treebank_raw.sents()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 单独句子标识符的合并链表</span></span><br><span class="line">tokens = []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 包含所有句子-边界标识符索引的集合</span></span><br><span class="line">boundaries = set()</span><br><span class="line">offset = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> sents:</span><br><span class="line">    tokens.extend(sent)</span><br><span class="line">    offset += len(sent)</span><br><span class="line">    boundaries.add(offset - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>指定用于决定标点是否表示句子边界的数据特征</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">punct_features</span><span class="params">(tokens, i)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">'next-word-capitalized'</span>: tokens[i + <span class="number">1</span>][<span class="number">0</span>].isupper(),</span><br><span class="line">            <span class="string">'prevword'</span>: tokens[i - <span class="number">1</span>].lower(),</span><br><span class="line">            <span class="string">'punct'</span>: tokens[i],</span><br><span class="line">            <span class="string">'prev-word-is-one-char'</span>: len(tokens[i - <span class="number">1</span>]) == <span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>基于特征提取器,选择所有标点符号创建一个加标签的特征集链表,然后标注他们是否是边界标识符<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">featuresets = [(punct_features(tokens, i), (i <span class="keyword">in</span> boundaries))</span><br><span class="line">               <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(tokens) - <span class="number">1</span>)</span><br><span class="line">               <span class="keyword">if</span> tokens[i] <span class="keyword">in</span> <span class="string">'.?!'</span>]</span><br></pre></td></tr></table></figure></p>
+<p>使用特征集训练评估标点符号分类器<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">size = int(len(featuresets) * <span class="number">0.1</span>)</span><br><span class="line">train_set, test_set = featuresets[size:], featuresets[:size]</span><br><span class="line">classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br><span class="line">print(nltk.classify.accuracy(classifier, test_set))</span><br><span class="line"><span class="comment"># 0.936026936026936</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="识别对话行为类型"><a href="#识别对话行为类型" class="headerlink" title="识别对话行为类型"></a>识别对话行为类型</h4><p>表述行为的陈述句，问候，问题，回答，断言和说明都可以被认为是基于语言的行为类型。识别对话中隐含语言下的对话行为是理解谈话的重要步骤</p>
+<p>利用NPS聊天语料库数据建立一个分类器,用来识别新的即时消息帖子的对话行为类型.</p>
+<blockquote>
+<p>NPS聊天语料库(ref 2.1 节)包括超过 10000 个来自即时消息会话的帖子.<br>这些帖子都已经被贴上了 15 种对话行为类型中的某一种标签,eg:’陈述’、<br>‘情感’、’ynQuestion’、’Continuer’ .</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提取基本的消息数据</span></span><br><span class="line">posts = nltk.corpus.nps_chat.xml_posts()[:<span class="number">10000</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个简单的特征提取器,用于检测帖子包含什么词</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dialogue_act_features</span><span class="params">(post)</span>:</span></span><br><span class="line">    features = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> word <span class="keyword">in</span> nltk.word_tokenize(post):</span><br><span class="line">        features[<span class="string">'contains(%s)'</span> % word.lower()] = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> features</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造训练和测试数据</span></span><br><span class="line"><span class="comment"># post.get('class') 获取帖子的对话行为类型</span></span><br><span class="line">featuresets = [(dialogue_act_features(post.text), post.get(<span class="string">'class'</span>)) <span class="keyword">for</span> post <span class="keyword">in</span> posts]</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">featuresets数据结构及部分结果</span></span><br><span class="line"><span class="string">[</span></span><br><span class="line"><span class="string">(&#123;'contains(now)': True, 'contains(im)': True, 'contains(left)': True, 'contains(with)': True, 'contains(this)': True, 'contains(gay)': True, 'contains(name)': True&#125;, 'Statement'), </span></span><br><span class="line"><span class="string">(&#123;'contains(:)': True, 'contains(p)': True&#125;, 'Emotion'), ...</span></span><br><span class="line"><span class="string">]</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 分割数据并进行训练 测试</span></span><br><span class="line">size = int(len(featuresets) * <span class="number">0.1</span>)</span><br><span class="line">train_set, test_set = featuresets[size:], featuresets[:size]</span><br><span class="line">classifier = nltk.NaiveBayesClassifier.train(train_set)</span><br><span class="line">print(nltk.classify.accuracy(classifier, test_set))  <span class="comment"># 0.668</span></span><br></pre></td></tr></table></figure>
+<h4 id="识别文字蕴涵"><a href="#识别文字蕴涵" class="headerlink" title="识别文字蕴涵"></a>识别文字蕴涵</h4><p>识别文字蕴涵(<code>Recognizing textual entailment, RTE</code>)是判断文本Ｔ内的一个给定片段是否继承另一个叫做’假设’的文本。迄今为止，已经有４个RTE挑战赛，在那里共享的开发和测试数据会提供给参赛队伍。</p>
+<p>另外,文本和假设之间的关系并不一定是逻辑蕴含,而是能否得出’文本提供的合理证据证明假设是真实的’这一结论</p>
+<p>可以把RTE当作一个分类任务,尝试为每一对预测真/假标签.在理想情况下,希望如果有蕴含,那么假设所表示的所有信息也应该再文本中表示.相反,如果假设中有而资料文本中没有,那么就没有蕴含.</p>
+<p>示例中让词作为信息的代理,计数词重叠的程度(<code>hyp_extra()</code>方法).词的重要程度不同,一般命名实体(人,组织,地方等名称)可能更为重要,这促使我们使用 words 和 nes 提取不同的信息</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># rte默认没有下载,先进行下载</span></span><br><span class="line"><span class="comment"># nltk.download('rte')</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># '识别文字蕴含'的特征提取器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rte_features</span><span class="params">(rtepair)</span>:</span></span><br><span class="line">    <span class="comment"># RTEFeatureExtractor 类建立了一个在文本和假设中都有的并已去除一些停用词后的词汇包</span></span><br><span class="line">    extractor = nltk.RTEFeatureExtractor(rtepair)</span><br><span class="line">    features = &#123;&#125;</span><br><span class="line">    <span class="comment"># 计算重叠性和差异性</span></span><br><span class="line">    features[<span class="string">'word_overlap'</span>] = len(extractor.overlap(<span class="string">'word'</span>))</span><br><span class="line">    features[<span class="string">'word_hyp_extra'</span>] = len(extractor.hyp_extra(<span class="string">'word'</span>))</span><br><span class="line">    features[<span class="string">'ne_overlap'</span>] = len(extractor.overlap(<span class="string">'ne'</span>))</span><br><span class="line">    features[<span class="string">'ne_hyp_extra'</span>] = len(extractor.hyp_extra(<span class="string">'ne'</span>))</span><br><span class="line">    <span class="keyword">return</span> features</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Challenge 3,Pair 34(True).</span></span><br><span class="line">rtepair = nltk.corpus.rte.pairs([<span class="string">'rte3_dev.xml'</span>])[<span class="number">33</span>]</span><br><span class="line">extractor = nltk.RTEFeatureExtractor(rtepair)</span><br><span class="line">print(extractor.text_words)</span><br><span class="line">print(extractor.hyp_words)</span><br><span class="line">print(extractor.overlap(<span class="string">'word'</span>))</span><br><span class="line">print(extractor.overlap(<span class="string">'ne'</span>))</span><br><span class="line">print(extractor.hyp_extra(<span class="string">'word'</span>))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">&#123;'operation', 'Soviet', 'meeting', 'Davudi', 'Russia', 'terrorism.', 'Parviz', 'former', 'SCO', 'at', 'association', 'Organisation', 'binds', 'republics', 'fight', 'four', 'Asia', 'together', 'representing', 'that', 'China', 'fledgling', 'central', 'Iran', 'Shanghai', 'was', 'Co'&#125;</span></span><br><span class="line"><span class="string">&#123;'member', 'SCO.', 'China'&#125;</span></span><br><span class="line"><span class="string">set()</span></span><br><span class="line"><span class="string">&#123;'China'&#125;</span></span><br><span class="line"><span class="string">&#123;'member'&#125;</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+<h4 id="扩展到大型数据集"><a href="#扩展到大型数据集" class="headerlink" title="扩展到大型数据集"></a>扩展到大型数据集</h4><p>纯Python的分类不是很快，建议探索NLTK与外部机器学习包的接口技术，</p>
+<blockquote>
+<p>查看 NLTK 网站推荐的 NLTK 支持机器学习包列表</p>
+</blockquote>
+<h3 id="6-3-评估-略"><a href="#6-3-评估-略" class="headerlink" title="6.3 评估(略)"></a>6.3 评估(略)</h3><h4 id="测试集"><a href="#测试集" class="headerlink" title="测试集"></a>测试集</h4><h4 id="准确度"><a href="#准确度" class="headerlink" title="准确度"></a>准确度</h4><h4 id="精确度和召回率"><a href="#精确度和召回率" class="headerlink" title="精确度和召回率"></a>精确度和召回率</h4><ul>
+<li>真阳性</li>
+<li>真阴性</li>
+<li>假阳性</li>
+<li>假阴性</li>
+</ul>
+<hr>
+<ul>
+<li>精确度(Precision)<br>  TP/(TP+FP)</li>
+<li>召回率(recall)<br>  TP/(TP+FN)</li>
+<li>F-度量值(F-Measure)(或称 F-得分,F-Score)<br>  组合精度和召回率为一个单独的得分<br>  定义为精确度和召回率的调和平均数<br>  (2<em>Precision</em>Recall)/(Precision+Recall)</li>
+</ul>
+<h4 id="混淆矩阵"><a href="#混淆矩阵" class="headerlink" title="混淆矩阵"></a>混淆矩阵</h4><h4 id="交叉验证"><a href="#交叉验证" class="headerlink" title="交叉验证"></a>交叉验证</h4><h3 id="6-4-决策树-略"><a href="#6-4-决策树-略" class="headerlink" title="6.4 决策树(略)"></a>6.4 决策树(略)</h3><ul>
+<li>熵和信息增益</li>
+</ul>
+<h3 id="6-5-朴素贝叶斯分类器-略"><a href="#6-5-朴素贝叶斯分类器-略" class="headerlink" title="6.5 朴素贝叶斯分类器(略)"></a>6.5 朴素贝叶斯分类器(略)</h3><h4 id="潜在概率模型"><a href="#潜在概率模型" class="headerlink" title="潜在概率模型"></a>潜在概率模型</h4><h4 id="零计数和平滑"><a href="#零计数和平滑" class="headerlink" title="零计数和平滑"></a>零计数和平滑</h4><h4 id="非二元特征"><a href="#非二元特征" class="headerlink" title="非二元特征"></a>非二元特征</h4><h4 id="独立的朴素性"><a href="#独立的朴素性" class="headerlink" title="独立的朴素性"></a>独立的朴素性</h4><h4 id="双重计数的原因"><a href="#双重计数的原因" class="headerlink" title="双重计数的原因"></a>双重计数的原因</h4><h3 id="6-6-最大熵分类器-略"><a href="#6-6-最大熵分类器-略" class="headerlink" title="6.6 最大熵分类器(略)"></a>6.6 最大熵分类器(略)</h3><h4 id="最大熵模型"><a href="#最大熵模型" class="headerlink" title="最大熵模型"></a>最大熵模型</h4><h4 id="熵的最大化"><a href="#熵的最大化" class="headerlink" title="熵的最大化"></a>熵的最大化</h4><h4 id="生成式分类器对比条件分类器"><a href="#生成式分类器对比条件分类器" class="headerlink" title="生成式分类器对比条件分类器"></a>生成式分类器对比条件分类器</h4><h3 id="6-7-为语言模式建模-略"><a href="#6-7-为语言模式建模-略" class="headerlink" title="6.7 为语言模式建模(略)"></a>6.7 为语言模式建模(略)</h3><p>模型告诉我们什么？</p>
+<h3 id="6-8-深入阅读-略"><a href="#6-8-深入阅读-略" class="headerlink" title="6.8 深入阅读(略)"></a>6.8 深入阅读(略)</h3><p>使用Weka, Mallet, TADM 和 MegaM </p>
+
+            <div class="post-copyright">
+    <div class="content">
+        <p>最后更新： 2019年05月08日 11:19</p>
+        <p>原始链接： <a class="post-url" href="/2019/05/06/Python_NLP_06/" title="Python自然语言处理06 学习分类文本">https://ice-melt.github.io/2019/05/06/Python_NLP_06/</a></p>
+        <footer>
+            <a href="https://ice-melt.github.io">
+                <img src="/images/logo.png" alt="ice-melt">
+                ice-melt
+            </a>
+        </footer>
+    </div>
+</div>
+
+      
+        
+            
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;">赏</a>
+</div>
+
+<div id="reward" class="post-modal reward-lay">
+    <a class="close" href="javascript:;" id="reward-close">×</a>
+    <span class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        您的支持是我原创的动力
+        <i class="icon icon-quote-right"></i>
+    </span>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/images/wechat_code.jpg" alt="打赏二维码">
+        </div>
+        <div class="reward-select">
+            
+            <label class="reward-select-item checked" data-id="wechat" data-wechat="/images/wechat_code.jpg">
+                <img class="reward-select-item-wechat" src="/images/wechat.png" alt="微信">
+            </label>
+            
+            
+            <label class="reward-select-item" data-id="alipay" data-alipay="/images/alipay_code.jpg">
+                <img class="reward-select-item-alipay" src="/images/alipay.png" alt="支付宝">
+            </label>
+            
+        </div>
+    </div>
+</div>
+
+
+        
+    </div>
+    <footer class="article-footer">
+        
+        
+<div class="post-share">
+    <a href="javascript:;" id="share-sub" class="post-share-fab">
+        <i class="fa fa-share-alt"></i>
+    </a>
+    <div class="post-share-list" id="share-list">
+        <ul class="share-icons">
+          <li>
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/&title=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+              <i class="fa fa-weibo"></i>
+            </a>
+          </li>
+          <li>
+            <a class="weixin share-sns" id="wxFab" href="javascript:;" data-title="微信">
+              <i class="fa fa-weixin"></i>
+            </a>
+          </li>
+          <li>
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/&title=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&source=模式识别是自然语言处理的一个核心部分.
+
+以-ed结尾的词往往是过去时态动词(ref 5 chapter)
+频繁使用will暗示这是新闻文本(ref 3 ..." data-title="QQ">
+              <i class="fa fa-qq"></i>
+            </a>
+          </li>
+          <li>
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/05/06/Python_NLP_06/" data-title="Facebook">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/&via=https://ice-melt.github.io" data-title="Twitter">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/" data-title="Google+">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        </ul>
+     </div>
+</div>
+<div class="post-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;" id="wxShare-close">×</a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/05/06/Python_NLP_06/" alt="微信分享二维码">
+</div>
+
+<div class="mask"></div>
+
+        
+        <ul class="article-footer-menu">
+            
+            
+  <li class="article-footer-tags">
+    <i class="fa fa-tags"></i>
+      
+    <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
+      
+    <a href="/tags/NLP/" class="color4">NLP</a>
+      
+  </li>
+
+        </ul>
+        
+    </footer>
+  </div>
+</article>
+
+
+    <aside class="post-toc-pos post-toc-top" id="post-toc">
+        <nav class="post-toc-wrap">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-1-监督式分类"><span class="post-toc-text">6.1 监督式分类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#性别鉴定"><span class="post-toc-text">性别鉴定</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#选择正确的特征"><span class="post-toc-text">选择正确的特征</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#文档分类"><span class="post-toc-text">文档分类</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词性标注"><span class="post-toc-text">词性标注</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#探索上下文语境"><span class="post-toc-text">探索上下文语境</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#序列分类"><span class="post-toc-text">序列分类</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#其他序列分类方法"><span class="post-toc-text">其他序列分类方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-2-监督式分类的举例"><span class="post-toc-text">6.2 监督式分类的举例</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#句子分割"><span class="post-toc-text">句子分割</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#识别对话行为类型"><span class="post-toc-text">识别对话行为类型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#识别文字蕴涵"><span class="post-toc-text">识别文字蕴涵</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#扩展到大型数据集"><span class="post-toc-text">扩展到大型数据集</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-3-评估-略"><span class="post-toc-text">6.3 评估(略)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#测试集"><span class="post-toc-text">测试集</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#准确度"><span class="post-toc-text">准确度</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#精确度和召回率"><span class="post-toc-text">精确度和召回率</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#混淆矩阵"><span class="post-toc-text">混淆矩阵</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#交叉验证"><span class="post-toc-text">交叉验证</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-4-决策树-略"><span class="post-toc-text">6.4 决策树(略)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-5-朴素贝叶斯分类器-略"><span class="post-toc-text">6.5 朴素贝叶斯分类器(略)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#潜在概率模型"><span class="post-toc-text">潜在概率模型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#零计数和平滑"><span class="post-toc-text">零计数和平滑</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#非二元特征"><span class="post-toc-text">非二元特征</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#独立的朴素性"><span class="post-toc-text">独立的朴素性</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#双重计数的原因"><span class="post-toc-text">双重计数的原因</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-6-最大熵分类器-略"><span class="post-toc-text">6.6 最大熵分类器(略)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#最大熵模型"><span class="post-toc-text">最大熵模型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#熵的最大化"><span class="post-toc-text">熵的最大化</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#生成式分类器对比条件分类器"><span class="post-toc-text">生成式分类器对比条件分类器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-7-为语言模式建模-略"><span class="post-toc-text">6.7 为语言模式建模(略)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-8-深入阅读-略"><span class="post-toc-text">6.8 深入阅读(略)</span></a></li></ol>
+        </nav>
+    </aside>
+    
+
+<nav id="article-nav">
+  
+  
+    <a href="/2019/05/05/HEXO/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">HEXO</span>
+      <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+    </a>
+  
+</nav>
+
+
+
+    
+        <div id="SOHUCS" sid="Python_NLP_06"></div>
+<script type="text/javascript">
+    (function(){
+        var appid = 'cytRPCpOX';
+        var conf = 'prod_1e65dc7b851067d2e5fa952e667c6b16';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+    
+</section>
+        
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+      <p>
+        Powered by  <a href="http://hexo.io/" target="_blank">Hexo</a>
+        Theme <a href="//github.com/wongminho/hexo-theme-miho" target="_blank">MiHo</a>
+      &copy; 2019 ice-melt<br>
+      </p>
+    </div>
+  </div>
+</footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  var mihoConfig = {
+      root: "https://ice-melt.github.io",
+      animate: true,
+      isHome: false,
+      share: true,
+      reward: 1
+  }
+</script>
+<div class="sidebar">
+    <div id="sidebar-search" title="Search">
+        <i class="fa fa-search"></i>
+    </div>
+    <div id="sidebar-category" title="Categories">
+        <i class="fa fa-book"></i>
+    </div>
+    <div id="sidebar-tag" title="Tags">
+        <i class="fa fa-tags"></i>
+    </div>
+    <div id="sidebar-top">
+        <span class="sidebar-top-icon"><i class="fa fa-angle-up"></i></span>
+    </div>
+</div>
+<div class="sidebar-menu-box" id="sidebar-menu-box">
+    <div class="sidebar-menu-box-container">
+        <div id="sidebar-menu-box-categories">
+            
+        </div>
+        <div id="sidebar-menu-box-tags">
+            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+    <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
+</div>
+<div class="mobile-header-menu-nav" id="mobile-header-menu-nav">
+    <div class="mobile-header-menu-container">
+        <span class="title">Menus</span>
+        <ul class="mobile-header-menu-navbar">
+            
+            <li>
+                <a href="/">
+                    <i class="fa fa-home"></i><span>Home</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/archives">
+                    <i class="fa fa-archive"></i><span>Archives</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/about">
+                    <i class="fa fa-user"></i><span>About</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="mobile-header-tag-container">
+        <span class="title">Tags</span>
+        <div id="mobile-header-container-tags">
+            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+</div>
+<div class="search-wrap">
+    <span class="search-close">&times;</span>
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+            <i class="icon icon-lg icon-chevron-left"></i>
+        </a>
+        <input class="search-field" placeholder="Search..." id="keywords">
+        <a id="search-submit" href="javascript:;">
+            <i class="fa fa-search"></i>
+        </a>
+    <div class="search-container" id="search-container">
+        <ul class="search-result" id="search-result">
+        </ul>
+    </div>
+</div>
+
+<div id="search-tpl">
+    <li class="search-result-item">
+        <a href="{url}" class="search-item-li">
+            <span class="search-item-li-title" title="{title}">{title}</span>
+        </a>
+    </li>
+</div>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+
+
+  <script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles"></div>
+  <script src="/js/particles.js"></script>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  <script src="//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js"></script>
+  <script src="/js/animate.js"></script>
+
+
+  <script src="/js/pop-img.js"></script>
+  <script>
+     $(".article-entry p img").popImg();
+  </script>
+
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

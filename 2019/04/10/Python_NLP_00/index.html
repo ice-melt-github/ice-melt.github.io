@@ -3,23 +3,23 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
   
-  <title>Python自然语言处理00 | 夕兮曦兮的个人网站</title>
+  <title>Python自然语言处理 写在前面 | 夕兮曦兮的个人网站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <meta name="keywords" content="ice-melt's Blog">
   
-  <meta name="description" content="Python自然语言处理更新中…">
+  <meta name="description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习知识结构的话再补上引用连接) 在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢">
 <meta name="keywords" content="Python自然语言处理,NLP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Python自然语言处理00">
-<meta property="og:url" content="https://ice-melt.github.io/2019/04/10/Python自然语言处理00/index.html">
+<meta property="og:title" content="Python自然语言处理 写在前面">
+<meta property="og:url" content="https://ice-melt.github.io/2019/04/10/Python_NLP_00/index.html">
 <meta property="og:site_name" content="夕兮曦兮的个人网站">
-<meta property="og:description" content="Python自然语言处理更新中…">
+<meta property="og:description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习知识结构的话再补上引用连接) 在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-05-06T08:52:18.394Z">
+<meta property="og:updated_time" content="2019-05-08T03:26:28.889Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Python自然语言处理00">
-<meta name="twitter:description" content="Python自然语言处理更新中…">
+<meta name="twitter:title" content="Python自然语言处理 写在前面">
+<meta name="twitter:description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习知识结构的话再补上引用连接) 在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢">
   
   
     <link rel="icon" href="/favicon.ico">
@@ -130,14 +130,14 @@ MathJax.Hub.Queue(function() {
     </div>
 </header>
       <div class="outer">
-        <section id="main" class="body-wrap"><article id="post-Python自然语言处理00" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main" class="body-wrap"><article id="post-Python_NLP_00" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="post-title" itemprop="name">
-      Python自然语言处理00
+      Python自然语言处理 写在前面
     </h1>
     <div class="post-title-bar">
       <ul>
@@ -159,18 +159,22 @@ MathJax.Hub.Queue(function() {
     <div class="article-entry post-content" itemprop="articleBody">
       
             
-            <h1 id="Python自然语言处理"><a href="#Python自然语言处理" class="headerlink" title="Python自然语言处理"></a>Python自然语言处理</h1><p>更新中…<br><a id="more"></a></p>
-<h2 id="Python自然语言处理勘误笔记"><a href="#Python自然语言处理勘误笔记" class="headerlink" title="Python自然语言处理勘误笔记"></a>Python自然语言处理勘误笔记</h2><h3 id="对字典的keys-进行切片保存"><a href="#对字典的keys-进行切片保存" class="headerlink" title="对字典的keys()进行切片保存"></a>对字典的keys()进行切片保存</h3><p><code>words.keys()[:2000]</code> </p>
-<p>修改为: <code>list(words.keys())[:2000]</code></p>
-<h3 id="FreqDist对象的inc方法报错"><a href="#FreqDist对象的inc方法报错" class="headerlink" title="FreqDist对象的inc方法报错"></a>FreqDist对象的inc方法报错</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> brown</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">suffix_fdist = nltk.FreqDist()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 找出最常见的后缀</span></span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> brown.words():</span><br><span class="line">    word = word.lower()</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-1</span>:])</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-2</span>:])</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-3</span>:])</span><br></pre></td></tr></table></figure>
+            <p>这个系列的博客是基于《Python自然语言处理》这本书的学习笔记.</p>
+<p>关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,<br>(以后有机会整理Python和机器学习知识结构的话再补上引用连接)</p>
+<p>在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢<br><a id="more"></a></p>
+<h2 id="Python自然语言处理勘误笔记"><a href="#Python自然语言处理勘误笔记" class="headerlink" title="Python自然语言处理勘误笔记"></a>Python自然语言处理勘误笔记</h2><h3 id="FreqDist对象的inc方法报错"><a href="#FreqDist对象的inc方法报错" class="headerlink" title="FreqDist对象的inc方法报错"></a>FreqDist对象的inc方法报错</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> brown</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">suffix_fdist = nltk.FreqDist()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 找出最常见的后缀</span></span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> brown.words():</span><br><span class="line">    word = word.lower()</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-1</span>:])</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-2</span>:])</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-3</span>:])</span><br></pre></td></tr></table></figure>
 <p>错误信息为:<br><code>AttributeError: &#39;FreqDist&#39; object has no attribute &#39;inc&#39;</code></p>
 <p>可以修改为:<br><code>suffix_fdist[word[-1:]] += 1</code></p>
 <p>FreqDist对象通常像这样使用:<br><code>fd = FreqDist(my_text)</code></p>
+<h3 id="对字典的keys-进行切片保存"><a href="#对字典的keys-进行切片保存" class="headerlink" title="对字典的keys()进行切片保存"></a>对字典的keys()进行切片保存</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> movie_reviews</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">all_words = nltk.FreqDist(w.lower() <span class="keyword">for</span> w <span class="keyword">in</span> movie_reviews.words())</span><br><span class="line">word_feature = list(all_words.keys())[:<span class="number">2000</span>]</span><br></pre></td></tr></table></figure>
+<p>错误信息为:<br><code>TypeError: &#39;dict_keys&#39; object is not subscriptable</code></p>
+<p>这是因为字典的keys对象不支持切片,转换成list即可</p>
+<p>可以修改为: <code>word_feature = list(all_words.keys())[:2000]</code></p>
 
             <div class="post-copyright">
     <div class="content">
-        <p>最后更新： 2019年05月06日 16:52</p>
-        <p>原始链接： <a class="post-url" href="/2019/04/10/Python自然语言处理00/" title="Python自然语言处理00">https://ice-melt.github.io/2019/04/10/Python自然语言处理00/</a></p>
+        <p>最后更新： 2019年05月08日 11:26</p>
+        <p>原始链接： <a class="post-url" href="/2019/04/10/Python_NLP_00/" title="Python自然语言处理 写在前面">https://ice-melt.github.io/2019/04/10/Python_NLP_00/</a></p>
         <footer>
             <a href="https://ice-melt.github.io">
                 <img src="/images/logo.png" alt="ice-melt">
@@ -227,7 +231,7 @@ MathJax.Hub.Queue(function() {
     <div class="post-share-list" id="share-list">
         <ul class="share-icons">
           <li>
-            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/04/10/Python自然语言处理00/&title=《Python自然语言处理00》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/04/10/Python_NLP_00/&title=《Python自然语言处理 写在前面》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
               <i class="fa fa-weibo"></i>
             </a>
           </li>
@@ -237,22 +241,23 @@ MathJax.Hub.Queue(function() {
             </a>
           </li>
           <li>
-            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/04/10/Python自然语言处理00/&title=《Python自然语言处理00》 — 夕兮曦兮的个人网站&source=Python自然语言处理更新中…" data-title="QQ">
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/04/10/Python_NLP_00/&title=《Python自然语言处理 写在前面》 — 夕兮曦兮的个人网站&source=这个系列的博客是基于《Python自然语言处理》这本书的学习笔记.
+关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会..." data-title="QQ">
               <i class="fa fa-qq"></i>
             </a>
           </li>
           <li>
-            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/04/10/Python自然语言处理00/" data-title="Facebook">
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/04/10/Python_NLP_00/" data-title="Facebook">
               <i class="fa fa-facebook"></i>
             </a>
           </li>
           <li>
-            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理00》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/04/10/Python自然语言处理00/&via=https://ice-melt.github.io" data-title="Twitter">
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理 写在前面》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/04/10/Python_NLP_00/&via=https://ice-melt.github.io" data-title="Twitter">
               <i class="fa fa-twitter"></i>
             </a>
           </li>
           <li>
-            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/04/10/Python自然语言处理00/" data-title="Google+">
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/04/10/Python_NLP_00/" data-title="Google+">
               <i class="fa fa-google-plus"></i>
             </a>
           </li>
@@ -262,7 +267,7 @@ MathJax.Hub.Queue(function() {
 <div class="post-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;" id="wxShare-close">×</a>
     <p>扫一扫，分享到微信</p>
-    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/04/10/Python自然语言处理00/" alt="微信分享二维码">
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/04/10/Python_NLP_00/" alt="微信分享二维码">
 </div>
 
 <div class="mask"></div>
@@ -289,7 +294,7 @@ MathJax.Hub.Queue(function() {
 
     <aside class="post-toc-pos post-toc-top" id="post-toc">
         <nav class="post-toc-wrap">
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Python自然语言处理"><span class="post-toc-text">Python自然语言处理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Python自然语言处理勘误笔记"><span class="post-toc-text">Python自然语言处理勘误笔记</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#对字典的keys-进行切片保存"><span class="post-toc-text">对字典的keys()进行切片保存</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#FreqDist对象的inc方法报错"><span class="post-toc-text">FreqDist对象的inc方法报错</span></a></li></ol></li></ol></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Python自然语言处理勘误笔记"><span class="post-toc-text">Python自然语言处理勘误笔记</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#FreqDist对象的inc方法报错"><span class="post-toc-text">FreqDist对象的inc方法报错</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#对字典的keys-进行切片保存"><span class="post-toc-text">对字典的keys()进行切片保存</span></a></li></ol></li></ol>
         </nav>
     </aside>
     
@@ -317,7 +322,7 @@ MathJax.Hub.Queue(function() {
 
 
     
-        <div id="SOHUCS" sid="Python自然语言处理00"></div>
+        <div id="SOHUCS" sid="Python_NLP_00"></div>
 <script type="text/javascript">
     (function(){
         var appid = 'cytRPCpOX';
