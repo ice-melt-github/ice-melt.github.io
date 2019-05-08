@@ -12,12 +12,12 @@
 <meta name="keywords" content="Python自然语言处理,NLP">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python自然语言处理06 学习分类文本">
-<meta property="og:url" content="https://ice-melt.github.io/2019/05/06/Python_NLP_06/index.html">
+<meta property="og:url" content="https://ice-melt.github.io/2019/04/22/Python_NLP_06/index.html">
 <meta property="og:site_name" content="夕兮曦兮的个人网站">
 <meta property="og:description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190506154303588.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
-<meta property="og:updated_time" content="2019-05-08T03:19:15.689Z">
+<meta property="og:updated_time" content="2019-05-08T06:07:31.094Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python自然语言处理06 学习分类文本">
 <meta name="twitter:description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
@@ -145,7 +145,7 @@ MathJax.Hub.Queue(function() {
       <ul>
           
         <li>
-          <i class="fa fa-calendar"></i>  2019-05-06
+          <i class="fa fa-calendar"></i>  2019-04-22
         </li>
         <li>
           <i class="fa fa-eye"></i>
@@ -285,8 +285,8 @@ MathJax.Hub.Queue(function() {
 
             <div class="post-copyright">
     <div class="content">
-        <p>最后更新： 2019年05月08日 11:19</p>
-        <p>原始链接： <a class="post-url" href="/2019/05/06/Python_NLP_06/" title="Python自然语言处理06 学习分类文本">https://ice-melt.github.io/2019/05/06/Python_NLP_06/</a></p>
+        <p>最后更新： 2019年05月08日 14:07</p>
+        <p>原始链接： <a class="post-url" href="/2019/04/22/Python_NLP_06/" title="Python自然语言处理06 学习分类文本">https://ice-melt.github.io/2019/04/22/Python_NLP_06/</a></p>
         <footer>
             <a href="https://ice-melt.github.io">
                 <img src="/images/logo.png" alt="ice-melt">
@@ -343,7 +343,7 @@ MathJax.Hub.Queue(function() {
     <div class="post-share-list" id="share-list">
         <ul class="share-icons">
           <li>
-            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/&title=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/04/22/Python_NLP_06/&title=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
               <i class="fa fa-weibo"></i>
             </a>
           </li>
@@ -353,7 +353,7 @@ MathJax.Hub.Queue(function() {
             </a>
           </li>
           <li>
-            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/&title=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&source=模式识别是自然语言处理的一个核心部分.
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/04/22/Python_NLP_06/&title=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&source=模式识别是自然语言处理的一个核心部分.
 
 以-ed结尾的词往往是过去时态动词(ref 5 chapter)
 频繁使用will暗示这是新闻文本(ref 3 ..." data-title="QQ">
@@ -361,17 +361,17 @@ MathJax.Hub.Queue(function() {
             </a>
           </li>
           <li>
-            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/05/06/Python_NLP_06/" data-title="Facebook">
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/04/22/Python_NLP_06/" data-title="Facebook">
               <i class="fa fa-facebook"></i>
             </a>
           </li>
           <li>
-            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/&via=https://ice-melt.github.io" data-title="Twitter">
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理06 学习分类文本》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/04/22/Python_NLP_06/&via=https://ice-melt.github.io" data-title="Twitter">
               <i class="fa fa-twitter"></i>
             </a>
           </li>
           <li>
-            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/05/06/Python_NLP_06/" data-title="Google+">
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/04/22/Python_NLP_06/" data-title="Google+">
               <i class="fa fa-google-plus"></i>
             </a>
           </li>
@@ -381,7 +381,7 @@ MathJax.Hub.Queue(function() {
 <div class="post-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;" id="wxShare-close">×</a>
     <p>扫一扫，分享到微信</p>
-    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/05/06/Python_NLP_06/" alt="微信分享二维码">
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/04/22/Python_NLP_06/" alt="微信分享二维码">
 </div>
 
 <div class="mask"></div>
@@ -415,19 +415,19 @@ MathJax.Hub.Queue(function() {
 
 <nav id="article-nav">
   
-    <a href="/2019/05/06/Python-NLP-05/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/05/05/HEXO/" id="article-nav-newer" class="article-nav-link-wrap">
 
       <span class="article-nav-title">
         <i class="fa fa-hand-o-left" aria-hidden="true"></i>
         
-          Python自然语言处理05 分类和标注词汇
+          HEXO
         
       </span>
     </a>
   
   
-    <a href="/2019/05/05/HEXO/" id="article-nav-older" class="article-nav-link-wrap">
-      <span class="article-nav-title">HEXO</span>
+    <a href="/2019/04/18/Python-NLP-05/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Python自然语言处理05 分类和标注词汇</span>
       <i class="fa fa-hand-o-right" aria-hidden="true"></i>
     </a>
   
