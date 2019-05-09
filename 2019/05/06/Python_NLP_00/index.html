@@ -8,18 +8,18 @@
   
     <meta name="keywords" content="ice-melt's Blog">
   
-  <meta name="description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习知识结构的话再补上引用连接) 在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢">
-<meta name="keywords" content="Python自然语言处理,NLP">
+  <meta name="description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习相关知识的话再补上引用连接) 关于代码会完整的整理到我的github代码仓库中,并且会做一定的修改以方便复用或展示所有代码已修改为python3版本,代码运行结果和书中的相关示例结果有可能会不一致,多为训练的随机性造成">
+<meta name="keywords" content="Python自然语言处理">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python自然语言处理 写在前面">
 <meta property="og:url" content="https://ice-melt.github.io/2019/05/06/Python_NLP_00/index.html">
 <meta property="og:site_name" content="夕兮曦兮的个人网站">
-<meta property="og:description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习知识结构的话再补上引用连接) 在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢">
+<meta property="og:description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习相关知识的话再补上引用连接) 关于代码会完整的整理到我的github代码仓库中,并且会做一定的修改以方便复用或展示所有代码已修改为python3版本,代码运行结果和书中的相关示例结果有可能会不一致,多为训练的随机性造成">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-05-08T06:08:09.767Z">
+<meta property="og:updated_time" content="2019-05-09T09:26:18.052Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python自然语言处理 写在前面">
-<meta name="twitter:description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习知识结构的话再补上引用连接) 在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢">
+<meta name="twitter:description" content="这个系列的博客是基于《Python自然语言处理》这本书的学习笔记. 关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,(以后有机会整理Python和机器学习相关知识的话再补上引用连接) 关于代码会完整的整理到我的github代码仓库中,并且会做一定的修改以方便复用或展示所有代码已修改为python3版本,代码运行结果和书中的相关示例结果有可能会不一致,多为训练的随机性造成">
   
   
     <link rel="icon" href="/favicon.ico">
@@ -142,6 +142,13 @@ MathJax.Hub.Queue(function() {
     <div class="post-title-bar">
       <ul>
           
+              <li>
+                  <i class="fa fa-book"></i>
+                  
+                      <a href="/categories/NLP/">NLP</a>
+                  
+              </li>
+          
         <li>
           <i class="fa fa-calendar"></i>  2019-05-06
         </li>
@@ -160,7 +167,8 @@ MathJax.Hub.Queue(function() {
       
             
             <p>这个系列的博客是基于《Python自然语言处理》这本书的学习笔记.</p>
-<p>关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,<br>(以后有机会整理Python和机器学习知识结构的话再补上引用连接)</p>
+<p>关于整本书的内容中,Python部分和有关机器学习部分的内容我会酌情略过,<br>(以后有机会整理Python和机器学习相关知识的话再补上引用连接)</p>
+<p>关于代码会完整的整理到我的github代码仓库中,并且会做一定的修改以方便复用或展示<br>所有代码已修改为python3版本,代码运行结果和书中的相关示例结果有可能会不一致,多为训练的随机性造成</p>
 <p>在最前面会陆续整理出学习过程中发现的错误,如果有朋友发现任何其他错误或问题欢迎留言告知,谢谢<br><a id="more"></a></p>
 <h2 id="Python自然语言处理勘误笔记"><a href="#Python自然语言处理勘误笔记" class="headerlink" title="Python自然语言处理勘误笔记"></a>Python自然语言处理勘误笔记</h2><h3 id="FreqDist对象的inc方法报错"><a href="#FreqDist对象的inc方法报错" class="headerlink" title="FreqDist对象的inc方法报错"></a>FreqDist对象的inc方法报错</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> brown</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">suffix_fdist = nltk.FreqDist()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 找出最常见的后缀</span></span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> brown.words():</span><br><span class="line">    word = word.lower()</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-1</span>:])</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-2</span>:])</span><br><span class="line">    suffix_fdist.inc(word[<span class="number">-3</span>:])</span><br></pre></td></tr></table></figure>
 <p>错误信息为:<br><code>AttributeError: &#39;FreqDist&#39; object has no attribute &#39;inc&#39;</code></p>
@@ -170,10 +178,17 @@ MathJax.Hub.Queue(function() {
 <p>错误信息为:<br><code>TypeError: &#39;dict_keys&#39; object is not subscriptable</code></p>
 <p>这是因为字典的keys对象不支持切片,转换成list即可</p>
 <p>可以修改为: <code>word_feature = list(all_words.keys())[:2000]</code></p>
+<h3 id="方法不存在"><a href="#方法不存在" class="headerlink" title="方法不存在"></a>方法不存在</h3><ol>
+<li><code>nltk.sem.show_raw_rtuple(rel)</code><br> 修改为<br> <code>nltk.sem.relextract.rtuple(rel)</code></li>
+<li><code>nltk.sem.show_clause(r, relsym=&quot;VAN&quot;)</code><br> 修改为<br> <code>nltk.sem.relextract.clause(r, relsym=&quot;VAN&quot;)</code><h2 id="未解决问题汇总"><a href="#未解决问题汇总" class="headerlink" title="未解决问题汇总"></a>未解决问题汇总</h2></li>
+<li>继承<code>nltk.ChunkParserI</code>的类有波浪线提示,应该是超类中有为实现的方法<br> <code>Class BigramChunker must implement all abstract methods</code></li>
+<li>P296 使用连续分类器对名词短语分块(需要安装oCaml 和 maxnet,安装尚未解决)<br> <code>NLTK was unable to find the megam file!</code></li>
+<li>P302 递归遍历树状图报错<br> <code>TypeError: Tree: Expected a node value and child list</code><br> <code>NotImplementedError: Use label() to access a node label.</code></li>
+</ol>
 
             <div class="post-copyright">
     <div class="content">
-        <p>最后更新： 2019年05月08日 14:08</p>
+        <p>最后更新： 2019年05月09日 17:26</p>
         <p>原始链接： <a class="post-url" href="/2019/05/06/Python_NLP_00/" title="Python自然语言处理 写在前面">https://ice-melt.github.io/2019/05/06/Python_NLP_00/</a></p>
         <footer>
             <a href="https://ice-melt.github.io">
@@ -281,8 +296,6 @@ MathJax.Hub.Queue(function() {
       
     <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
       
-    <a href="/tags/NLP/" class="color4">NLP</a>
-      
   </li>
 
         </ul>
@@ -294,14 +307,14 @@ MathJax.Hub.Queue(function() {
 
     <aside class="post-toc-pos post-toc-top" id="post-toc">
         <nav class="post-toc-wrap">
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Python自然语言处理勘误笔记"><span class="post-toc-text">Python自然语言处理勘误笔记</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#FreqDist对象的inc方法报错"><span class="post-toc-text">FreqDist对象的inc方法报错</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#对字典的keys-进行切片保存"><span class="post-toc-text">对字典的keys()进行切片保存</span></a></li></ol></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Python自然语言处理勘误笔记"><span class="post-toc-text">Python自然语言处理勘误笔记</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#FreqDist对象的inc方法报错"><span class="post-toc-text">FreqDist对象的inc方法报错</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#对字典的keys-进行切片保存"><span class="post-toc-text">对字典的keys()进行切片保存</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#方法不存在"><span class="post-toc-text">方法不存在</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#未解决问题汇总"><span class="post-toc-text">未解决问题汇总</span></a></li></ol>
         </nav>
     </aside>
     
 
 <nav id="article-nav">
   
-    <a href="/2019/05/08/Python-NLP-07/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/05/08/Python_NLP_07/" id="article-nav-newer" class="article-nav-link-wrap">
 
       <span class="article-nav-title">
         <i class="fa fa-hand-o-left" aria-hidden="true"></i>
@@ -384,10 +397,10 @@ MathJax.Hub.Queue(function() {
 <div class="sidebar-menu-box" id="sidebar-menu-box">
     <div class="sidebar-menu-box-container">
         <div id="sidebar-menu-box-categories">
-            
+            <a class="category-link" href="/categories/NLP/">NLP</a>
         </div>
         <div id="sidebar-menu-box-tags">
-            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
         </div>
     </div>
     <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
@@ -420,7 +433,7 @@ MathJax.Hub.Queue(function() {
     <div class="mobile-header-tag-container">
         <span class="title">Tags</span>
         <div id="mobile-header-container-tags">
-            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
         </div>
     </div>
 </div>
@@ -470,6 +483,23 @@ MathJax.Hub.Queue(function() {
      $(".article-entry p img").popImg();
   </script>
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src>
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
 </body>
 </html>

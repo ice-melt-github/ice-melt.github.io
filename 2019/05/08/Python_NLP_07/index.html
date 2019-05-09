@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Python自然语言处理07 从文本提取信息 | 夕兮曦兮的个人网站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="keywords" content="ice-melt's Blog">
+  
+  <meta name="description" content="本章回答下列问题: (1)如何能构建一个系统,以至从非结构化文本中提取结构化数据? (2)有哪些稳健的方法识别一个文本描述的实体和关系? (3)哪些语料库适合这项工作,如何使用它们来训练和评估模型? 使用最后两章技术解决分块和命名实体识别的问题">
+<meta name="keywords" content="Python自然语言处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python自然语言处理07 从文本提取信息">
+<meta property="og:url" content="https://ice-melt.github.io/2019/05/08/Python_NLP_07/index.html">
+<meta property="og:site_name" content="夕兮曦兮的个人网站">
+<meta property="og:description" content="本章回答下列问题: (1)如何能构建一个系统,以至从非结构化文本中提取结构化数据? (2)有哪些稳健的方法识别一个文本描述的实体和关系? (3)哪些语料库适合这项工作,如何使用它们来训练和评估模型? 使用最后两章技术解决分块和命名实体识别的问题">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190508153545245.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2019050816013254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190508173854119.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190508194418418.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190508194446605.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190509092402561.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-05-09T09:33:23.365Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python自然语言处理07 从文本提取信息">
+<meta name="twitter:description" content="本章回答下列问题: (1)如何能构建一个系统,以至从非结构化文本中提取结构化数据? (2)有哪些稳健的方法识别一个文本描述的实体和关系? (3)哪些语料库适合这项工作,如何使用它们来训练和评估模型? 使用最后两章技术解决分块和命名实体识别的问题">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190508153545245.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/pace.min.js"></script>
+  
+
+  
+  
+
+  
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+</head>
+</html>
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+      <header id="header">
+    <div id="banner"></div>
+    <div id="header-outer">
+        <div id="header-menu" class="header-menu-pos animated">
+            <div class="header-menu-container">
+                <a href="/" class="left">
+                    <span class="site-title">ice-melt&#39;s Blog</span>
+                </a>
+                <nav id="header-menu-nav" class="right">
+                    
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    
+                    <a href="/archives">
+                        <i class="fa fa-archive"></i>
+                        <span>Archives</span>
+                    </a>
+                    
+                    <a href="/about">
+                        <i class="fa fa-user"></i>
+                        <span>About</span>
+                    </a>
+                    
+                </nav>
+                <a class="mobile-header-menu-button">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+        </div>
+        <div id="header-row">
+            <div id="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="header-info">
+                <div id="header-title">
+                    
+                    <h2>
+                        ice-melt&#39;s Blog
+                    </h2>
+                    
+                </div>
+                <div id="header-description">
+                    
+                    <h3>
+                        冰冻三尺 非一日之寒 积土成山 非斯须之作。
+                    </h3>
+                    
+                </div>
+            </div>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a title="ice-melt" target="_blank" href="https://ice-melt.github.io/">
+                            <i class="fa fa-home fa-2x"></i></a>
+                    
+                        <a title="Github" target="_blank" href="//github.com/ice-melt">
+                            <i class="fa fa-github fa-2x"></i></a>
+                    
+                        <a title="Weibo" target="_blank" href="//weibo.com/ice-melt">
+                            <i class="fa fa-weibo fa-2x"></i></a>
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+      <div class="outer">
+        <section id="main" class="body-wrap"><article id="post-Python_NLP_07" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="post-title" itemprop="name">
+      Python自然语言处理07 从文本提取信息
+    </h1>
+    <div class="post-title-bar">
+      <ul>
+          
+              <li>
+                  <i class="fa fa-book"></i>
+                  
+                      <a href="/categories/NLP/">NLP</a>
+                  
+              </li>
+          
+        <li>
+          <i class="fa fa-calendar"></i>  2019-05-08
+        </li>
+        <li>
+          <i class="fa fa-eye"></i>
+          <span id="busuanzi_value_page_pv"></span>
+        </li>
+      </ul>
+    </div>
+  
+
+          
+      </header>
+    
+    <div class="article-entry post-content" itemprop="articleBody">
+      
+            
+            <p>本章回答下列问题:</p>
+<p>(1)如何能构建一个系统,以至从非结构化文本中提取结构化数据?</p>
+<p>(2)有哪些稳健的方法识别一个文本描述的实体和关系?</p>
+<p>(3)哪些语料库适合这项工作,如何使用它们来训练和评估模型?</p>
+<p>使用最后两章技术解决分块和命名实体识别的问题<br><a id="more"></a></p>
+<h3 id="7-1-信息提取"><a href="#7-1-信息提取" class="headerlink" title="7.1 信息提取"></a>7.1 信息提取</h3><p>信息有很多种’形状’和’大小’,一个重要的形式是<strong>结构化数据</strong>:实体和关系的规范和可预测的组织。例如:我们可能对公司和地点间的关系感兴趣.<br>给定公司,希望能确定其做业务的位置,反过来,给定位置,想发现那些公司在该位置做业务.<br>如果数据是表格形式,可以很明确的回答这些问题</p>
+<center bgcolor="#f1f1f1">表 7-1 位置数据</center>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">机构名</th>
+<th style="text-align:center">位置名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Omnicom</td>
+<td style="text-align:center">New York</td>
+</tr>
+<tr>
+<td style="text-align:center">DDB Needham</td>
+<td style="text-align:center">New York</td>
+</tr>
+<tr>
+<td style="text-align:center">Kaplan Thaler Group</td>
+<td style="text-align:center">New York</td>
+</tr>
+<tr>
+<td style="text-align:center">BBDO South</td>
+<td style="text-align:center">Atlanta</td>
+</tr>
+<tr>
+<td style="text-align:center">Georgia-Pacific</td>
+<td style="text-align:center">Atlanta</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>但如果我们尝试从文本中获得相似的信息,事情就比较麻烦了。例如以下片段(摘自 <code>nltk.corpus.ieer</code>,fileid=’NYT19980315.0085’)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">	The fourth &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Wells&lt;e_enamex&gt; account moving to another agency is the</span><br><span class="line">packaged paper-products division of &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Georgia-Pacific Corp.&lt;e_enamex&gt;, which</span><br><span class="line">arrived at &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Wells&lt;e_enamex&gt; only last &lt;b_timex type=&quot;DATE&quot;&gt;fall&lt;e_timex&gt;. Like &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Hertz&lt;e_enamex&gt; and the &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;History</span><br><span class="line">Channel&lt;e_enamex&gt;, it is also leaving for an &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Omnicom&lt;e_enamex&gt;-owned agency, the &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;BBDO</span><br><span class="line">South&lt;e_enamex&gt; unit of &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;BBDO Worldwide&lt;e_enamex&gt;.</span><br><span class="line">	&lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;BBDO South&lt;e_enamex&gt; in &lt;b_enamex type=&quot;LOCATION&quot;&gt;Atlanta&lt;e_enamex&gt;, which handles corporate advertising for</span><br><span class="line">&lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Georgia-Pacific&lt;e_enamex&gt;, will assume additional duties for brands like</span><br><span class="line">Angel Soft toilet tissue and Sparkle paper towels, said &lt;b_enamex type=&quot;PERSON&quot;&gt;Ken Haldin&lt;e_enamex&gt;,</span><br><span class="line">a spokesman for &lt;b_enamex type=&quot;ORGANIZATION&quot;&gt;Georgia-Pacific&lt;e_enamex&gt; in &lt;b_enamex type=&quot;LOCATION&quot;&gt;Atlanta&lt;e_enamex&gt;.</span><br></pre></td></tr></table></figure></p>
+<p>与表7-1不同,片段中不包含连接组织名和位置名的结构,如何让一台机器理解片段然后将链表<code>[&#39;BBDO South&#39;,&#39;Georgia-Pacific&#39;]</code>作为答案返回呢?<br>这是一个困难得多的任务,解决方法之一是建立一个非常一般的含义(ref 10 chapter),<br>本章的解决方法是提前定为只查找文本中非常具体的各种信息(如组织和地点的关系),<br>先将自然语言句子这样的非结构数据转换成表7-1的结构化数据,然后利用强大的查询工具(如SQL)<br>这种从文本获取意义的方法被称为<strong>信息提取</strong></p>
+<p>信息提取有许多应用,包括商业智能、简历收获、媒体分析、情感检测、专利检索及电子邮件扫描。<br>当前研究的一个特别重要的领域是提取出电子科学文献的结构化数据,特别是在生物学和医学领域。</p>
+<h4 id="信息提取结构"><a href="#信息提取结构" class="headerlink" title="信息提取结构"></a>信息提取结构</h4><p>图 7-1 显示了一个简单的信息提取系统的结构,</p>
+<p>步骤:</p>
+<ol>
+<li>使用句子分割器将文档的原始内容文本分割成句</li>
+<li>使用分词器将每个句子进一步细分为词</li>
+<li>对每个句子进行词性标注</li>
+<li><strong>命名实体识别</strong>,寻找每个句子中提到的潜在的实体</li>
+<li>使用<strong>关系识别</strong>搜索文本中不同实体间的可能关系</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20190508153545245.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70" alt="7-1"></p>
+<font color="#0099ff" size="2" face="黑体">
+图7-1  用于信息提取系统的简单流水线架构.这个系统需要将文档的原始文本作为输入,将生成`(entity, relation, entity)`的元组列表作为输入.
+例如，给定文档假设 Georgia-Pacific 公司位于
+Atlanta,它可能会产生元组([ORG: 'Georgia-Pacific'] 'in' [LOC: 'Atlanta']).
+</font>
+
+<p>执行前面３个任务<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk, re, pprint</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ie_preprocess</span><span class="params">(document)</span>:</span></span><br><span class="line">    sentences = nltk.sent_tokenize(document)                      <span class="comment">#句子分割器</span></span><br><span class="line">    sentences = [nltk.word_tokenize(sent) <span class="keyword">for</span> sent <span class="keyword">in</span> sentences]  <span class="comment">#分词器</span></span><br><span class="line">    sentences = [nltk.pos_tag(sent) <span class="keyword">for</span> sent <span class="keyword">in</span> sentence]         <span class="comment">#词性标注器</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-2-分块"><a href="#7-2-分块" class="headerlink" title="7.2 分块"></a>7.2 分块</h3><p>用于实体识别的基本技术是<strong>分块(<code>chunking</code>)</strong>,分割和标注如图7-2所示的多标识符序列.</p>
+<p>小框显示词级标识符和词性标注,大框显示较高级的程序分块.较大的框叫做组块(chunk).</p>
+<p>就像分词忽略空白符,程序分块通常选择标识符的一个子集.</p>
+<p>同分词一样,分块构成的源文本中的片段不能重叠</p>
+<p><img src="https://img-blog.csdnimg.cn/2019050816013254.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70" alt="7-2"></p>
+<font color="#0099ff" size="2" face="黑体">
+图7-2  词标识符和块级别的分割与标注
+</font>
+
+<p>本节将在较深的层面上探讨程序分块,以组块的定义和表示开始.我们将看到正则表达式和n-gram方法分块,使用CoNLL-2000分块语料库开发和评估分块器。</p>
+<h4 id="名词短语分块"><a href="#名词短语分块" class="headerlink" title="名词短语分块"></a>名词短语分块</h4><p><strong><code>NP-chunking</code>（名词短语分块)</strong>,寻找单独名词短语对应的块</p>
+<p>下面是一些《华尔街日报》的文本,其中的NP-分块用方括号标记.</p>
+<pre><code>[ The/DT market/NN ] for/IN [ system-management/NN software/NN ] for/IN
+[ Digital/NNP ] [ ’s/POS hardware/NN ] is/VBZ fragmented/JJ enough/RB
+that/IN [ a/DT giant/NN ] such/JJ as/IN [ Computer/NNP Associates/NNPS ]
+should/MD do/VB well/RB there/RB ./.
+</code></pre><p>NP-分块通常比完整的名词短语更小.例如 <em>the market for system-management software for Digital’s hardware</em> 是一个单独的名词短语(含2个嵌套的名词短语),<br>它里面有一个简单的NP-分块<code>the market</code>.<br>这种差异产生的动机是:NP-分块被定义为不包含其它的NP-分块.<br>因此,修饰一个名词的任何一个介词短语或从句将不包括在相应的NP-分块内<br>(因为它们几乎可以肯定包含更多的名词短语).</p>
+<p>NP-分块信息最有用的来源之一是词性标记。这是在信息提取系统中进行词性标注的动机之一。</p>
+<p>为了创建NP-分块,首先定义<strong>分块语法</strong>,规定句子应如何分块。在本例中,使用一个正则表达式规则定义一个简单的语法。</p>
+<p>这条规则是NP-分块由可选的且后面跟着任意数目形容词(JJ)的限定词和名词(NN)组成。使用此语法创建组块分析器,测试例句。结果得到树状图,可以输出或显示图形。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line"><span class="comment"># 已标注词性的例句</span></span><br><span class="line">sentence = [(<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"little"</span>, <span class="string">"JJ"</span>), (<span class="string">"yellow"</span>, <span class="string">"JJ"</span>), (<span class="string">"dog"</span>, <span class="string">"NN"</span>), (<span class="string">"barked"</span>, <span class="string">"VBD"</span>), (<span class="string">"at"</span>, <span class="string">"IN"</span>),</span><br><span class="line">            (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"cat"</span>, <span class="string">"NN"</span>)]</span><br><span class="line"><span class="comment"># 正则表达式规则定义NP-分块语法:由可选的且后面跟着任意数目形容词(JJ)的限定词和名词(NN)组成</span></span><br><span class="line">grammar = <span class="string">"NP: &#123;&lt;DT&gt;?&lt;JJ&gt;*&lt;NN&gt;&#125;"</span></span><br><span class="line">cp = nltk.RegexpParser(grammar)</span><br><span class="line">result = cp.parse(sentence)</span><br><span class="line">print(result)</span><br><span class="line"></span><br><span class="line">result.draw()</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP the/DT little/JJ yellow/JJ dog/NN)</span></span><br><span class="line"><span class="string">  barked/VBD</span></span><br><span class="line"><span class="string">  at/IN</span></span><br><span class="line"><span class="string">  (NP the/DT cat/NN))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img-blog.csdnimg.cn/20190508173854119.png" alt="nlp_eg7-1"></p>
+<h4 id="标记模式"><a href="#标记模式" class="headerlink" title="标记模式"></a>标记模式</h4><p>组成块语法的规则利用<strong>标记模式</strong>描述已标注的词的序列.<br>标记模式是用尖括号分隔的词性标记序列,如<code>NP: {&lt;DT&gt;?&lt;JJ&gt;*&lt;NN&gt;}</code>.<br>标记模式类似正则表达式模式(ref 3.4)</p>
+<p>现在思考以下名词短语(来自《华尔街日报》)</p>
+<pre><code>another/DT sharp/JJ dive/NN
+trade/NN figures/NNS
+any/DT new/JJ policy/NN measures/NNS
+earlier/JJR stages/NNS
+Panamanian/JJ dictator/NN Manuel/NNP Noriega/NNP
+</code></pre><p>略微改进之前的标记模式,以匹配这些名词短语.如<code>NP: {&lt;DT&gt;?&lt;JJ.*&gt;*&lt;NN.*&gt;+}</code></p>
+<p>然而,还存在许多该规则不包括的、更复杂的例子.</p>
+<pre><code>his/PRP$ Mansion/NNP House/NNP speech/NN
+the/DT price/NN cutting/VBG
+3/CD %/NN to/TO 4/CD %/NN
+more/JJR than/IN 10/CD %/NN
+the/DT fastest/JJS developing/VBG trends/NNS
+&#39;s/POS skill/NN
+</code></pre><blockquote>
+<p>可以尝试使用图形界面 <code>nltk.app.chunkparser()</code>测试覆盖这些案例的标记模式.<br>使用此工具提供的帮助资料完善标记模式</p>
+</blockquote>
+<h4 id="用正则表达式分块"><a href="#用正则表达式分块" class="headerlink" title="用正则表达式分块"></a>用正则表达式分块</h4><p>为了找到给定句子的分块结构, <code>RegexpParser</code> 分块器<br>以一个平面结构开始,其中的标识符都未被分块.</p>
+<p>轮流应用分块规则,依次更新块结构.所有的规则都被调用后,返回快结构.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">grammar = <span class="string">r"""</span></span><br><span class="line"><span class="string">   NP: &#123;&lt;DT|PP\$&gt;?&lt;JJ&gt;*&lt;NN&gt;&#125;    #匹配一个可选的限定词或所有格代名词</span></span><br><span class="line"><span class="string">	   &#123;&lt;NNP&gt;+&#125;                 #匹配一个或多个专有名词</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">cp = nltk.RegexpParser(grammar)</span><br><span class="line">sentence = [(<span class="string">"Rapunzel"</span>, <span class="string">"NNP"</span>), (<span class="string">"let"</span>, <span class="string">"VBD"</span>), (<span class="string">"down"</span>, <span class="string">"RP"</span>), (<span class="string">"her"</span>, <span class="string">"PP$"</span>), (<span class="string">"long"</span>, <span class="string">"JJ"</span>), (<span class="string">"golden"</span>, <span class="string">"JJ"</span>),</span><br><span class="line">			(<span class="string">"hair"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">print(cp.parse(sentence))</span><br></pre></td></tr></table></figure>
+<pre><code>(S
+    (NP Rapunzel / NNP)
+    let / VBD
+    down / RP
+    (NP her / PP$ long / JJ golden / JJ hair / NN))
+</code></pre><p>如果将匹配两个连续名词的文本的规则应用到包含３个连续名词的文本中,则只有前两个名词被分块<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">nouns = [(<span class="string">"money"</span>, <span class="string">"NN"</span>), (<span class="string">"market"</span>, <span class="string">"NN"</span>), (<span class="string">"fund"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">grammar = <span class="string">"NP: &#123;&lt;NN&gt;&lt;NN&gt;&#125;"</span>	<span class="comment"># 匹配两个名词</span></span><br><span class="line"></span><br><span class="line">cp = nltk.RegexpParser(grammar)</span><br><span class="line">print(cp.parse(nouns))</span><br><span class="line"><span class="comment"># (S (NP money/NN market/NN) fund/NN)</span></span><br></pre></td></tr></table></figure></p>
+<p>一旦创建了块<code>money market</code>,就说明已经消除了允许fund被包含在块中的上下文,<br>使用一种更加宽容的块规则就可以避免这个问题,如:<code>NP: {&lt;NN&gt;+}</code></p>
+<h4 id="探索文本语料库"><a href="#探索文本语料库" class="headerlink" title="探索文本语料库"></a>探索文本语料库</h4><p>使用分块器可以更轻松的在已标注的语料库中提取匹配特定词性标记序列的短语(ref 5.2)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cp = nltk.RegexpParser(<span class="string">'CHUNK: &#123;&lt;V.*&gt; &lt;TO&gt; &lt;V.*&gt;&#125;'</span>)</span><br><span class="line">brown = nltk.corpus.brown</span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> brown.tagged_sents():</span><br><span class="line">    tree = cp.parse(sent)</span><br><span class="line">    <span class="keyword">for</span> subtree <span class="keyword">in</span> tree.subtrees():</span><br><span class="line">        <span class="keyword">if</span> subtree.label() == <span class="string">'CHUNK'</span>: </span><br><span class="line">            <span class="keyword">print</span> subtree</span><br></pre></td></tr></table></figure>
+<pre><code>(CHUNK combined/VBN to/TO achieve/VB)
+(CHUNK continue/VB to/TO place/VB)
+(CHUNK serve/VB to/TO protect/VB)
+(CHUNK wanted/VBD to/TO wait/VB)
+(CHUNK allowed/VBN to/TO place/VB)
+......
+</code></pre><blockquote>
+<p><code>find_chunks</code> 函数见<a href="https://github.com/ice-melt/python.git" target="_blank" rel="noopener">代码库</a></p>
+<h4 id="缝隙"><a href="#缝隙" class="headerlink" title="缝隙"></a>缝隙</h4></blockquote>
+<p>定义想从块中排除什么有时是很容易的,为不包括在大块中的标识符序列定义一个<strong>缝隙</strong>,</p>
+<p><code>[ the/DT little/JJ yellow/JJ dog/NN ] barked/VBD at/IN [ the/DT cat/NN ]</code>中 <code>barked/VBD at/IN</code>是一个缝隙</p>
+<p>加缝隙是从大块中去除标识符序列的过程.</p>
+<ul>
+<li>如果匹配的标识符序列贯穿整块,那么这个整块将被去除;</li>
+<li>如果标识符序列出现在块中间,这些标识符会被去除,留下一个较小的块,在以前只有一个块的地方留下两个块</li>
+<li>如果序列在块的周边,这些标记会被去除,留下一个较小的块</li>
+</ul>
+<p>表 7-2 演示了此3中可能.</p>
+<center bgcolor="#f1f1f1">表 7-2. 3个加缝规则应用于同一个块</center>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align:left">整个块</th>
+<th style="text-align:left">块中间</th>
+<th style="text-align:left">块结尾</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td style="text-align:left">[a/DT little/JJ dog/NN]</td>
+<td style="text-align:left">[a/DT little/JJ dog/NN]</td>
+<td style="text-align:left">[a/DT little/JJ dog/NN]</td>
+</tr>
+<tr>
+<td>操作</td>
+<td style="text-align:left">Chink “DT JJ NN”</td>
+<td style="text-align:left">Chink “JJ”</td>
+<td style="text-align:left">Chink “NN”</td>
+</tr>
+<tr>
+<td>模式</td>
+<td style="text-align:left">}DT JJ NN{</td>
+<td style="text-align:left">}JJ{</td>
+<td style="text-align:left">}NN{</td>
+</tr>
+<tr>
+<td>输出</td>
+<td style="text-align:left">a/DT little/JJ dog/NN</td>
+<td style="text-align:left">[a/DT] little/JJ [dog/NN]</td>
+<td style="text-align:left">[a/DT little/JJ] dog/NN</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">grammar = <span class="string">r"""</span></span><br><span class="line"><span class="string">	NP:</span></span><br><span class="line"><span class="string">	   &#123;&lt;.*&gt;+&#125;      # 匹配所有</span></span><br><span class="line"><span class="string">	   &#125;&lt;VBD|IN&gt;+&#123;  #匹配 VBD或IN 序列</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">sentence = [(<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"little"</span>, <span class="string">"JJ"</span>), (<span class="string">"yellow"</span>, <span class="string">"JJ"</span>), (<span class="string">"dog"</span>, <span class="string">"NN"</span>), (<span class="string">"barked"</span>, <span class="string">"VBD"</span>), (<span class="string">"at"</span>, <span class="string">"IN"</span>),</span><br><span class="line">			(<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"cat"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">cp = nltk.RegexpParser(grammar)</span><br><span class="line">print(cp.parse(sentence))</span><br></pre></td></tr></table></figure>
+<pre><code>(S
+  (NP the/DT little/JJ yellow/JJ dog/NN)
+  barked/VBD
+  at/IN
+  (NP the/DT cat/NN))
+</code></pre><h4 id="分块的表示-标记与树状图"><a href="#分块的表示-标记与树状图" class="headerlink" title="分块的表示:标记与树状图"></a>分块的表示:标记与树状图</h4><p>作为标注和分析之间的中间状态(ref 8 chapter),块结构可以使用标记或树状图来表示。<br>使用最广泛的表示是<strong>IOB标记</strong></p>
+<p>在这个方案中,每个标识符被用３个特殊的块标签之一标注,I(inside,内部),O(outside,外部)或B(begin,开始).</p>
+<p>B标志着它是分块的开始。块内的标识符子序列被标注为I,其他标注为O</p>
+<p>B和I标记是块类型的后缀,如B-NP, I-NP。</p>
+<p>IOB标记已成为文件中表示块结构的标准方式,图 7-3 展示了此方案的例子:</p>
+<pre><code>We PRP B-NP
+saw VBD O
+the DT B-NP
+little JJ I-NP
+yellow JJ I-NP
+dog NN I-NP
+</code></pre><p><img src="https://img-blog.csdnimg.cn/20190508194418418.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70" alt="nlp_pic_7-3"></p>
+<center bgcolor="#f1f1f1">图 7-3 分块结构的标记标识符</center>
+
+<p>在这种表示方式中,每个标识符一行,和它的词性标记与块标记一起.这种格式允许表示多个块类型,只要块不重叠.块的结构也可以使用树来表示.这有利于使每块作为一个组成部分可以直接操作,如下图:</p>
+<p><img src="https://img-blog.csdnimg.cn/20190508194446605.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70" alt="nlp_pic_7-4"></p>
+<center bgcolor="#f1f1f1">图 7-4 块结构的树状图表示</center>
+
+<blockquote>
+<p>NLTK用树状图作为分块的内部表示,却提供这些树状图与IOB之间格式转换的方法</p>
+</blockquote>
+<h3 id="7-3-开发和评估分块器"><a href="#7-3-开发和评估分块器" class="headerlink" title="7.3 开发和评估分块器"></a>7.3 开发和评估分块器</h3><p>如何评估分块器?</p>
+<p>评估分块器需要一个合适的已标注语料库.</p>
+<ul>
+<li>首先寻找将<code>IOB</code>格式转换成<code>NLTK</code>树状图的机制</li>
+<li>然后是如何在一个更大规模上使用已分块的语料库完成上述过程</li>
+</ul>
+<p>本节学习</p>
+<ol>
+<li>如何为一个分块器相对于一个语料库的准确性打分,</li>
+<li>利用一些数据驱动方式搜索<code>NP分块</code>,</li>
+</ol>
+<h4 id="读取IOB格式与CoNLL2000分块语料库"><a href="#读取IOB格式与CoNLL2000分块语料库" class="headerlink" title="读取IOB格式与CoNLL2000分块语料库"></a>读取IOB格式与CoNLL2000分块语料库</h4><p>重点:扩展分块器的覆盖范围</p>
+<p>使用<code>corpora</code>模块,可以加载已标注的《华尔街日报文本》文本,然后使用<code>IOB</code>符号分块<br>(这个语料库提供的分块类型有<code>NP</code>、<code>VP</code>、<code>PP</code>,每个句子使用多行表示)</p>
+<p>转换函数<code>用多行字符串建立一个树状图表示,</code>参数可以选择使用3个分块类型的任何子集(例子中只使用了<code>NP</code>分块)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">text = <span class="string">'''</span></span><br><span class="line"><span class="string">he PRP B-NP</span></span><br><span class="line"><span class="string">accepted VBD B-VP</span></span><br><span class="line"><span class="string">the DT B-NP</span></span><br><span class="line"><span class="string">position NN I-NP</span></span><br><span class="line"><span class="string">of IN B-PP</span></span><br><span class="line"><span class="string">vice NN B-NP</span></span><br><span class="line"><span class="string">chairman NN I-NP</span></span><br><span class="line"><span class="string">of IN B-PP</span></span><br><span class="line"><span class="string">Carlyle NNP B-NP</span></span><br><span class="line"><span class="string">Group NNP I-NP</span></span><br><span class="line"><span class="string">, , O</span></span><br><span class="line"><span class="string">a DT B-NP</span></span><br><span class="line"><span class="string">merchant NN I-NP</span></span><br><span class="line"><span class="string">banking NN I-NP</span></span><br><span class="line"><span class="string">concern NN I-NP</span></span><br><span class="line"><span class="string">. . O</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line">nltk.chunk.conllstr2tree(text, chunk_types=[<span class="string">'NP'</span>]).draw()</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img-blog.csdnimg.cn/20190509092402561.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70" alt="nlp_pic_7-3"></p>
+<p>CoNLL2000分块语料库包含27万词的《华尔街日报》文本,分为’训练’和’测试’两部分,标注有词性标记和IOB格式分块标记。</p>
+<p>读取conll2000语料库训练部分的100个句子<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> conll2000</span><br><span class="line">print(conll2000.chunked_sents(<span class="string">'train.txt'</span>)[<span class="number">99</span>])</span><br><span class="line"><span class="comment"># (S</span></span><br><span class="line"><span class="comment">#   (PP Over/IN)</span></span><br><span class="line"><span class="comment">#   (NP a/DT cup/NN)</span></span><br><span class="line"><span class="comment">#   (PP of/IN)</span></span><br><span class="line"><span class="comment">#   (NP coffee/NN)</span></span><br><span class="line"><span class="comment">#   ,/,</span></span><br><span class="line"><span class="comment">#   (NP Mr./NNP Stone/NNP)</span></span><br><span class="line"><span class="comment">#   (VP told/VBD)</span></span><br><span class="line"><span class="comment">#   (NP his/PRP$ story/NN)</span></span><br><span class="line"><span class="comment">#   ./.)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 包含3中分块类型:NP分块,VP分块,PP分块;只选择NP分块</span></span><br><span class="line">print(conll2000.chunked_sents(<span class="string">'train.txt'</span>, chunk_types=[<span class="string">'NP'</span>])[<span class="number">99</span>])</span><br><span class="line"><span class="comment"># (S</span></span><br><span class="line"><span class="comment">#   Over/IN</span></span><br><span class="line"><span class="comment">#   (NP a/DT cup/NN)</span></span><br><span class="line"><span class="comment">#   of/IN</span></span><br><span class="line"><span class="comment">#   (NP coffee/NN)</span></span><br><span class="line"><span class="comment">#   ,/,</span></span><br><span class="line"><span class="comment">#   (NP Mr./NNP Stone/NNP)</span></span><br><span class="line"><span class="comment">#   told/VBD</span></span><br><span class="line"><span class="comment">#   (NP his/PRP$ story/NN)</span></span><br><span class="line"><span class="comment">#   ./.)</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="简单评估和基准"><a href="#简单评估和基准" class="headerlink" title="简单评估和基准"></a>简单评估和基准</h4><p>为琐碎的不创建任何块的块分析器<code>cp</code>建立一个基准<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cp = nltk.RegexpParser(<span class="string">""</span>)  <span class="comment"># 不分块</span></span><br><span class="line">test_sents = conll2000.chunked_sents(<span class="string">'test.txt'</span>, chunk_types=[<span class="string">'NP'</span>])</span><br><span class="line">print(cp.evaluate(test_sents))  <span class="comment"># 评估结果</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">ChunkParse score:</span></span><br><span class="line"><span class="string">	IOB Accuracy:  43.4%%</span></span><br><span class="line"><span class="string">	Precision:      0.0%%</span></span><br><span class="line"><span class="string">	Recall:         0.0%%</span></span><br><span class="line"><span class="string">	F-Measure:      0.0%%</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这里有个相当神奇的地方,程序输出了两个%,书中只有1个%,尚未定位到问题</p>
+</blockquote>
+<p>IOB标记准确性表明超过三分之一的词被标注为O,即没有在NP分块中.然而由于标注器没有找到任何分块,精度、召回率、F-度量均为零</p>
+<p>查找以名词短语标记的特征字母(如CD,DT和JJ)开头的标记<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">grammar = r&quot;NP: &#123;&lt;[CDJNP].*&gt;+&#125;&quot;</span><br><span class="line">cp = nltk.RegexpParser(grammar)  # 初级的正则表达式分块器</span><br><span class="line">test_sents = conll2000.chunked_sents(&apos;test.txt&apos;)</span><br><span class="line">print(cp.evaluate(test_sents))  # 评估结果</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">ChunkParse score:</span><br><span class="line">    IOB Accuracy:  87.7%%</span><br><span class="line">    Precision:     70.6%%</span><br><span class="line">    Recall:        38.5%%</span><br><span class="line">    F-Measure:     49.8%%</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"># 使用 chunk_types=[&apos;NP&apos;] 参数,ChunkParse score结果为和书中一致</span><br></pre></td></tr></table></figure></p>
+<p>这种方法结果较好,但是仍可以采用更多数据驱动的方式改善它,<br>这里可以使用训练语料找到对每个词性标记最有可能的块标记(I、O或B),<br>即使用<code>unigram标注器</code>(ref 5.4)建立一个分块器(不是确定每个词的正确词性标记,<br>而是给定每个词的词性标记,尝试确定正确的块标记)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnigramChunker</span><span class="params">(nltk.ChunkParserI)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, train_sents)</span>:</span></span><br><span class="line">        train_data = [[(t,c) <span class="keyword">for</span> w,t,c <span class="keyword">in</span> nltk.chunk.tree2conlltags(sent)] <span class="keyword">for</span> sent <span class="keyword">in</span> train_sents]</span><br><span class="line">        self.tagger = nltk.UnigramTagger(train_data)</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, sentence)</span>:</span></span><br><span class="line">        pos_tags = [pos <span class="keyword">for</span> (word,pos) <span class="keyword">in</span> sentence]</span><br><span class="line">        tagged_pos_tags = self.tagger.tag(pos_tags)</span><br><span class="line">        chunktags = [chunktag <span class="keyword">for</span> (pos, chunktag) <span class="keyword">in</span> tagged_pos_tags]</span><br><span class="line">        <span class="comment">#为词性标注IOB块标记</span></span><br><span class="line">        conlltags = [(word, pos, chunktag) <span class="keyword">for</span> ((word,pos),chunktag) <span class="keyword">in</span> zip(sentence, chunktags)]</span><br><span class="line">        <span class="keyword">return</span> nltk.chunk.conlltags2tree(conlltags) <span class="comment">#转换成分块树状图</span></span><br></pre></td></tr></table></figure>
+<p>使用训练语料找到对每个词性标记最有可能的块标记(I、O或B)<br>可以用bigram标注器建立一个分块器,但不是要确定每个词的正确词性标记,而是给定每个词的词性标记,尝试确定正确的块标记<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> conll2000</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BigramChunker</span><span class="params">(nltk.ChunkParserI)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, train_sents)</span>:</span></span><br><span class="line">        train_data = [[(t,c) <span class="keyword">for</span> w,t,c <span class="keyword">in</span> nltk.chunk.tree2conlltags(sent)] <span class="keyword">for</span> sent <span class="keyword">in</span> train_sents]</span><br><span class="line">        self.tagger = nltk.BigramTagger(train_data)</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, sentence)</span>:</span></span><br><span class="line">        pos_tags = [pos <span class="keyword">for</span> (word,pos) <span class="keyword">in</span> sentence]</span><br><span class="line">        tagged_pos_tags = self.tagger.tag(pos_tags)</span><br><span class="line">        chunktags = [chunktag <span class="keyword">for</span> (pos, chunktag) <span class="keyword">in</span> tagged_pos_tags]</span><br><span class="line">        <span class="comment">#为词性标注IOB块标记</span></span><br><span class="line">        conlltags = [(word, pos, chunktag) <span class="keyword">for</span> ((word,pos),chunktag) <span class="keyword">in</span> zip(sentence, chunktags)]</span><br><span class="line">        <span class="keyword">return</span> nltk.chunk.conlltags2tree(conlltags) <span class="comment">#转换成分块树状图</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用CoNLL2000分块语料库训练</span></span><br><span class="line">test_sents = conll2000.chunked_sents(<span class="string">'test.txt'</span>, chunk_types=[<span class="string">'NP'</span>])</span><br><span class="line">train_sents = conll2000.chunked_sents(<span class="string">'train.txt'</span>, chunk_types=[<span class="string">'NP'</span>])</span><br><span class="line">unigram_chunker = UnigramChunker(train_sents)</span><br><span class="line">print(unigram_chunker.evaluate(test_sents))</span><br><span class="line"><span class="comment"># ChunkParse score:</span></span><br><span class="line"><span class="comment">#     IOB Accuracy:  92.9%%</span></span><br><span class="line"><span class="comment">#     Precision:     79.9%%</span></span><br><span class="line"><span class="comment">#     Recall:        86.8%%</span></span><br><span class="line"><span class="comment">#     F-Measure:     83.2%%</span></span><br></pre></td></tr></table></figure></p>
+<p>此分块器结果更好,使用<code>unigram</code>标注器标记每个在语料库中出现的词性标记</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">postags = sorted(set(pos <span class="keyword">for</span> sent <span class="keyword">in</span> train_sents <span class="keyword">for</span> (word, pos) <span class="keyword">in</span> sent.leaves()))</span><br><span class="line">print(unigram_chunker.tagger.tag(postags))</span><br><span class="line"><span class="comment"># [(u'#', u'B-NP'), (u'$', u'B-NP'), (u"''", u'O'), (u'(', u'O'), (u')', u'O'),</span></span><br><span class="line">(<span class="string">u','</span>, <span class="string">u'O'</span>), (<span class="string">u'.'</span>, <span class="string">u'O'</span>), (<span class="string">u':'</span>, <span class="string">u'O'</span>), (<span class="string">u'CC'</span>, <span class="string">u'O'</span>), (<span class="string">u'CD'</span>, <span class="string">u'I-NP'</span>),</span><br><span class="line"> (<span class="string">u'DT'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'EX'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'FW'</span>, <span class="string">u'I-NP'</span>), (<span class="string">u'IN'</span>, <span class="string">u'O'</span>), </span><br><span class="line"> (<span class="string">u'JJ'</span>, <span class="string">u'I-NP'</span>), (<span class="string">u'JJR'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'JJS'</span>, <span class="string">u'I-NP'</span>), (<span class="string">u'MD'</span>, <span class="string">u'O'</span>), </span><br><span class="line"> (<span class="string">u'NN'</span>, <span class="string">u'I-NP'</span>), (<span class="string">u'NNP'</span>, <span class="string">u'I-NP'</span>), (<span class="string">u'NNPS'</span>, <span class="string">u'I-NP'</span>), (<span class="string">u'NNS'</span>, <span class="string">u'I-NP'</span>),</span><br><span class="line"> (<span class="string">u'PDT'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'POS'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'PRP'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'PRP$'</span>, <span class="string">u'B-NP'</span>),</span><br><span class="line"> (<span class="string">u'RB'</span>, <span class="string">u'O'</span>), (<span class="string">u'RBR'</span>, <span class="string">u'O'</span>), (<span class="string">u'RBS'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'RP'</span>, <span class="string">u'O'</span>), (<span class="string">u'SYM'</span>, <span class="string">u'O'</span>),</span><br><span class="line"> (<span class="string">u'TO'</span>, <span class="string">u'O'</span>), (<span class="string">u'UH'</span>, <span class="string">u'O'</span>), (<span class="string">u'VB'</span>, <span class="string">u'O'</span>), (<span class="string">u'VBD'</span>, <span class="string">u'O'</span>), (<span class="string">u'VBG'</span>, <span class="string">u'O'</span>),</span><br><span class="line"> (<span class="string">u'VBN'</span>, <span class="string">u'O'</span>), (<span class="string">u'VBP'</span>, <span class="string">u'O'</span>), (<span class="string">u'VBZ'</span>, <span class="string">u'O'</span>), (<span class="string">u'WDT'</span>, <span class="string">u'B-NP'</span>), </span><br><span class="line"> (<span class="string">u'WP'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'WP$'</span>, <span class="string">u'B-NP'</span>), (<span class="string">u'WRB'</span>, <span class="string">u'O'</span>), (<span class="string">u'``'</span>, <span class="string">u'O'</span>)]</span><br></pre></td></tr></table></figure>
+<p>结果表明除了两种货币符号<code>#</code>和<code>$</code>,大多数标点符号出现在NP分块以外.<br>限定词(DT)和所有格(PRP$和 WP$)出现在NP分块的开头,<br>而名词类型(NN,NNP,NNPS,NNS)大多出现在NP的分块之内.</p>
+<p>修改unigram分块器,可以很容易的建立bigram分块器,修改代码如下<br><figure class="highlight python"><figcaption><span>diff:true</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- self.tagger = nltk.UnigramTagger(train_data)</span><br><span class="line">+ self.tagger = nltk.BigramTagger(train_data)</span><br></pre></td></tr></table></figure></p>
+<h4 id="训练基于分类器的分块器"><a href="#训练基于分类器的分块器" class="headerlink" title="训练基于分类器的分块器"></a>训练基于分类器的分块器</h4><p>无论是基于正则表达式的分块器还是n-gram分块器,创建什么样的分块完全取决于词性标记.<br>然而,有时词性标记不足以确定一个句子应如何分块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(3) a. Joey/NN sold/VBD the/DT farmer/NN rice/NN ./.</span><br><span class="line">	b. Nick/NN broke/VBD my/DT computer/NN monitor/NN ./.</span><br></pre></td></tr></table></figure>
+<p>考虑例句,两句话词性标记相同,但分块方式不同</p>
+<p>第一句中,the farmer 和 rice 都是单独分块<br>第二句中,my computer monitor 是单独的分块<br>如果想最大限度的提升分块的性能,需要使用词的内容作为词性标记的补充.</p>
+<p>包含词的内容信息的一种方法是使用基于分类器的标注器对句子分块.<br>比如使用n-gram分块器,这个基于分类器器分块器分配IOB标记给句子中的词,<br>然后将这些标记转换为块.</p>
+<blockquote>
+<p>本小节示例需要安装 oCaml   </p>
+</blockquote>
+<p>使用连续分类器对名词短语分块<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-4-语言结构中的递归"><a href="#7-4-语言结构中的递归" class="headerlink" title="7.4 语言结构中的递归"></a>7.4 语言结构中的递归</h3><h4 id="用级联分块器构建嵌套结构"><a href="#用级联分块器构建嵌套结构" class="headerlink" title="用级联分块器构建嵌套结构"></a>用级联分块器构建嵌套结构</h4><p>只需创建一个包含递归规则的多级的分块语法,就可以建立任意深度的分块结构</p>
+<p>例子展示名词短语、介词短语、动词短语和句子的模式<br>这是一个4级分块语法器,可以用来创建深度最深为4的结构<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">grammar = <span class="string">r"""</span></span><br><span class="line"><span class="string">   NP: &#123;&lt;DT|JJ|NN.*&gt;+&#125;</span></span><br><span class="line"><span class="string">   PP: &#123;&lt;IN&gt;&lt;NP&gt;&#125;</span></span><br><span class="line"><span class="string">   VP: &#123;&lt;VB.*&gt;&lt;NP|PP|CLAUSE&gt;+$&#125;</span></span><br><span class="line"><span class="string">   CLAUSE: &#123;&lt;NP&gt;&lt;VP&gt;&#125;</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">cp = nltk.RegexpParser(grammar)</span><br><span class="line">sentence = [(<span class="string">"Mary"</span>, <span class="string">"NN"</span>), (<span class="string">"saw"</span>, <span class="string">"VBD"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"cat"</span>, <span class="string">"NN"</span>), (<span class="string">"sit"</span>, <span class="string">"VB"</span>), (<span class="string">"on"</span>, <span class="string">"IN"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>),</span><br><span class="line">            (<span class="string">"mat"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">print(cp.parse(sentence))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP Mary/NN)</span></span><br><span class="line"><span class="string">  saw/VBD</span></span><br><span class="line"><span class="string">  (CLAUSE</span></span><br><span class="line"><span class="string">    (NP the/DT cat/NN)</span></span><br><span class="line"><span class="string">    (VP sit/VB (PP on/IN (NP the/DT mat/NN)))))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>结果丢掉了以saw为首的VP<br>将此分块器应用到有更深嵌套的句子中,无法识别开始的VP块,如下例:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sentence = [(<span class="string">"John"</span>, <span class="string">"NNP"</span>), (<span class="string">"thinks"</span>, <span class="string">"VBZ"</span>), (<span class="string">"Mary"</span>, <span class="string">"NN"</span>),</span><br><span class="line">            (<span class="string">"saw"</span>, <span class="string">"VBD"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"cat"</span>, <span class="string">"NN"</span>), (<span class="string">"sit"</span>, <span class="string">"VB"</span>),</span><br><span class="line">            (<span class="string">"on"</span>, <span class="string">"IN"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"mat"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">print(cp.parse(sentence))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP John/NNP)</span></span><br><span class="line"><span class="string">  thinks/VBZ</span></span><br><span class="line"><span class="string">  (NP Mary/NN)</span></span><br><span class="line"><span class="string">  saw/VBD</span></span><br><span class="line"><span class="string">  (CLAUSE</span></span><br><span class="line"><span class="string">    (NP the/DT cat/NN)</span></span><br><span class="line"><span class="string">    (VP sit/VB (PP on/IN (NP the/DT mat/NN)))))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>解决方案: 添加loop参数,指定模式应该循环次数,让分块器在他的模式中循环<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cp = nltk.RegexpParser(grammar, loop=<span class="number">2</span>)  <span class="comment"># 添加循环</span></span><br><span class="line">print(cp.parse(sentence))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP John/NNP)</span></span><br><span class="line"><span class="string">  thinks/VBZ</span></span><br><span class="line"><span class="string">  (CLAUSE</span></span><br><span class="line"><span class="string">    (NP Mary/NN)</span></span><br><span class="line"><span class="string">    (VP</span></span><br><span class="line"><span class="string">      saw/VBD</span></span><br><span class="line"><span class="string">      (CLAUSE</span></span><br><span class="line"><span class="string">        (NP the/DT cat/NN)</span></span><br><span class="line"><span class="string">        (VP sit/VB (PP on/IN (NP the/DT mat/NN)))))))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="树状图"><a href="#树状图" class="headerlink" title="树状图"></a>树状图</h4><p>在NLTK中,创建树状图,方法是给节点添加标签和一个子链表</p>
+<p><code>tree = nltk.Tree(&#39;NP&#39;,[&#39;the&#39;,&#39;rabbit&#39;])</code></p>
+<p>tree的一些方法:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(tree[1])</span><br><span class="line">tree.node</span><br><span class="line">tree.leaves()</span><br><span class="line">tree.draw()</span><br></pre></td></tr></table></figure></p>
+<h4 id="树遍历"><a href="#树遍历" class="headerlink" title="树遍历"></a>树遍历</h4><p>使用递归函数来遍历树<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>书中例子会报<code>TypeError: Tree: Expected a node value and child list</code> 错误</p>
+</blockquote>
+<h3 id="7-5-命名实体识别"><a href="#7-5-命名实体识别" class="headerlink" title="7.5 命名实体识别"></a>7.5 命名实体识别</h3><center bgcolor="#f1f1f1">表 7-3 常用命名实体类型</center>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">NE类型</th>
+<th style="text-align:left">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">组织(ORGANIZATION)</td>
+<td style="text-align:left">Georgia-Pacific Corp., WHO</td>
+</tr>
+<tr>
+<td style="text-align:left">人(PERSON)</td>
+<td style="text-align:left">Eddy Bonte, President Obama</td>
+</tr>
+<tr>
+<td style="text-align:left">地点(LOCATION)</td>
+<td style="text-align:left">Murray River, Mount Everest</td>
+</tr>
+<tr>
+<td style="text-align:left">日期(DATE)</td>
+<td style="text-align:left">June, 2008-06-29</td>
+</tr>
+<tr>
+<td style="text-align:left">时间(TIME)</td>
+<td style="text-align:left">two fifty a m, 1:30 p.m.</td>
+</tr>
+<tr>
+<td style="text-align:left">货币(MONEY)</td>
+<td style="text-align:left">175 million Canadian Dollars, GBP 10.40</td>
+</tr>
+<tr>
+<td style="text-align:left">百分数(PERCENT)</td>
+<td style="text-align:left">twenty pct, 18.75 %</td>
+</tr>
+<tr>
+<td style="text-align:left">设施(FACILITY)</td>
+<td style="text-align:left">Washington Monument, Stonehenge</td>
+</tr>
+<tr>
+<td style="text-align:left">地缘政治实体(GPE South)</td>
+<td style="text-align:left">East Asia, Midlothian</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>命名实体识别(<code>NER</code>)</strong>系统的目标是识别所有文字提及的命名实体。</p>
+<p>这可以分解成两个子任务:<strong>确定NE的边界</strong>和<strong>确定其类型</strong>。</p>
+<p>命名实体识别经常是信息提取中关系识别的前奏,也有助于其他任务。例如:在问答系统(QA)中,我们试图提高信息检索的精确度,不用返回整个页面而只是包含用户问题的答案的那部分。大多数QA系统利用标准信息检索返回的文件,然后尝试分离文档中包含答案的最小的文本分段。</p>
+<p>假设问题:<code>Who was the first President of the US?</code><br>被检索的文档中包含答案,如下:</p>
+<pre><code>(5) The Washington Monument is the most prominent structure in Washington,
+D.C. and one of the city’s early attractions. It was built in honor of George
+Washington, who led the country to independence and then became its first
+President.
+</code></pre><p>我们想得到的答案应该是<code>X was the first President of the US</code>的形式,其中<code>X</code>不仅是一个名词短语也是一个PER类型的命名实体。</p>
+<p>识别命名实体可以通过查找适当的名称列表(如识别地点时,可以使用地名词典),但盲目这样做会出问题,比如人或组织名词的列表无法完全覆盖,另外许多实体措辞有歧义,如May和North可能是日期和地点,也有可能都是人名.<br>更大的挑战来自如’Stanford University’这样的多词名词和包含其他名词的名称,因此我们需要能够识别多标识符序列的开头和结尾</p>
+<p>NER是一个非常适合用于分类器类型的方法。</p>
+<p>NLTK提供了一个已经训练好的可以识别命名实体的分类器,使用函数nltk.ne_chunk()访问。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">sent = nltk.corpus.treebank.tagged_sents()[<span class="number">22</span>]</span><br><span class="line"><span class="comment"># 如果设置参数binary=True,那么命名实体只被标注为NE,否则,分类器会添加类型标签,如 PERSON, ORGANIZATION and GPE 等</span></span><br><span class="line">print(nltk.ne_chunk(sent, binary=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># (S</span></span><br><span class="line"><span class="comment">#   The/DT</span></span><br><span class="line"><span class="comment">#   (NE U.S./NNP)</span></span><br><span class="line"><span class="comment">#   is/VBZ</span></span><br><span class="line"><span class="comment">#   one/CD</span></span><br><span class="line"><span class="comment">#   ....</span></span><br><span class="line"><span class="comment">#   according/VBG</span></span><br><span class="line"><span class="comment">#   to/TO</span></span><br><span class="line"><span class="comment">#   (NE Brooke/NNP)</span></span><br><span class="line"><span class="comment">#   ...)</span></span><br><span class="line">print(nltk.ne_chunk(sent))  <span class="comment"># PERSON, ORGANIZATION and GPE</span></span><br><span class="line"><span class="comment"># (S</span></span><br><span class="line"><span class="comment">#   The/DT</span></span><br><span class="line"><span class="comment">#   (GPE U.S./NNP)</span></span><br><span class="line"><span class="comment">#   is/VBZ</span></span><br><span class="line"><span class="comment">#   one/CD</span></span><br><span class="line"><span class="comment">#   ......</span></span><br><span class="line"><span class="comment">#   according/VBG</span></span><br><span class="line"><span class="comment">#   to/TO</span></span><br><span class="line"><span class="comment">#   (PERSON Brooke/NNP T./NNP Mossman/NNP)</span></span><br><span class="line"><span class="comment">#   ....)</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-6-关系抽取"><a href="#7-6-关系抽取" class="headerlink" title="7.6 关系抽取"></a>7.6 关系抽取</h3><p>只要文本中的命名实体被识别,就可以提取它们之间存在的关系。</p>
+<p>关系抽取的方法是首先寻找所有(X, $\alpha$, Y)形式的三元组,其中X和Y是指定类型的命名实体,$\alpha$表示X和Y之间关系的字符串</p>
+<p>搜索包含词 in 的字符串,正则表达式会忽略动名词前为in的字符串(否定预测先行断言)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">IN = re.compile(<span class="string">r'.*\bin\b(?!\b.+ing)'</span>)</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> nltk.corpus.ieer.parsed_docs(<span class="string">'NYT_19980315'</span>):</span><br><span class="line">    <span class="keyword">for</span> rel <span class="keyword">in</span> nltk.sem.extract_rels(<span class="string">'ORG'</span>, <span class="string">'LOC'</span>, doc, corpus=<span class="string">'ieer'</span>, pattern=IN):</span><br><span class="line">        print(nltk.sem.relextract.rtuple(rel))</span><br><span class="line"></span><br><span class="line"><span class="comment"># [ORG: 'WHYY'] 'in' [LOC: 'Philadelphia']</span></span><br><span class="line"><span class="comment"># [ORG: 'McGlashan &amp;AMP; Sarrail'] 'firm in' [LOC: 'San Mateo']</span></span><br><span class="line"><span class="comment"># [ORG: 'Freedom Forum'] 'in' [LOC: 'Arlington']</span></span><br><span class="line"><span class="comment"># [ORG: 'Brookings Institution'] ', the research group in' [LOC: 'Washington']</span></span><br><span class="line"><span class="comment"># [ORG: 'Idealab'] ', a self-described business incubator based in' [LOC: 'Los Angeles']</span></span><br><span class="line"><span class="comment"># [ORG: 'Open Text'] ', based in' [LOC: 'Waterloo']</span></span><br><span class="line"><span class="comment"># [ORG: 'WGBH'] 'in' [LOC: 'Boston']</span></span><br><span class="line"><span class="comment"># [ORG: 'Bastille Opera'] 'in' [LOC: 'Paris']</span></span><br><span class="line"><span class="comment"># [ORG: 'Omnicom'] 'in' [LOC: 'New York']</span></span><br><span class="line"><span class="comment"># [ORG: 'DDB Needham'] 'in' [LOC: 'New York']</span></span><br><span class="line"><span class="comment"># [ORG: 'Kaplan Thaler Group'] 'in' [LOC: 'New York']</span></span><br><span class="line"><span class="comment"># [ORG: 'BBDO South'] 'in' [LOC: 'Atlanta']</span></span><br><span class="line"><span class="comment"># [ORG: 'Georgia-Pacific'] 'in' [LOC: 'Atlanta']</span></span><br></pre></td></tr></table></figure></p>
+<p>荷兰语的命名实体语料库<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> conll2002</span><br><span class="line"></span><br><span class="line">vnv = <span class="string">"""</span></span><br><span class="line"><span class="string">(</span></span><br><span class="line"><span class="string">is/V| # 3rd sing present and</span></span><br><span class="line"><span class="string">was/V| # past forms of the verb zijn ('be')</span></span><br><span class="line"><span class="string">werd/V| # and also present</span></span><br><span class="line"><span class="string">wordt/V # past of worden ('become')</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string">.* # followed by anything</span></span><br><span class="line"><span class="string">van/Prep # followed by van ('of')</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">VAN = re.compile(vnv, re.VERBOSE)</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> conll2002.chunked_sents(<span class="string">'ned.train'</span>):</span><br><span class="line">    <span class="keyword">for</span> r <span class="keyword">in</span> nltk.sem.extract_rels(<span class="string">'PER'</span>, <span class="string">'ORG'</span>, doc, corpus=<span class="string">'conll2002'</span>, pattern=VAN):</span><br><span class="line">        print(nltk.sem.relextract.clause(r, relsym=<span class="string">"VAN"</span>))</span><br><span class="line"><span class="comment"># VAN("cornet_d'elzius", 'buitenlandse_handel')</span></span><br><span class="line"><span class="comment"># VAN('johan_rottiers', 'kardinaal_van_roey_instituut')</span></span><br><span class="line"><span class="comment"># VAN('annie_lennox', 'eurythmics')</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> conll2002.chunked_sents(<span class="string">'ned.train'</span>):</span><br><span class="line">    <span class="keyword">for</span> r <span class="keyword">in</span> nltk.sem.extract_rels(<span class="string">'PER'</span>, <span class="string">'ORG'</span>, doc, corpus=<span class="string">'conll2002'</span>, pattern=VAN):</span><br><span class="line">        print(nltk.sem.relextract.rtuple(r, lcon=<span class="literal">True</span>, rcon=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># ...'')[PER: "Cornet/V d'Elzius/N"] 'is/V op/Prep dit/Pron ogenblik/N kabinetsadviseur/N van/Prep staatssecretaris/N voor/Prep' [ORG: 'Buitenlandse/N Handel/N'](''...</span></span><br><span class="line"><span class="comment"># ...'')[PER: 'Johan/N Rottiers/N'] 'is/V informaticacoördinator/N van/Prep het/Art' [ORG: 'Kardinaal/N Van/N Roey/N Instituut/N']('in/Prep'...</span></span><br><span class="line"><span class="comment"># ...'Door/Prep rugproblemen/N van/Prep zangeres/N')[PER: 'Annie/N Lennox/N'] 'wordt/V het/Art concert/N van/Prep' [ORG: 'Eurythmics/N']('vandaag/Adv in/Prep'...</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-7小结-略"><a href="#7-7小结-略" class="headerlink" title="7.7小结(略)"></a>7.7小结(略)</h3><h3 id="7-8深入阅读-略"><a href="#7-8深入阅读-略" class="headerlink" title="7.8深入阅读(略)"></a>7.8深入阅读(略)</h3>
+            <div class="post-copyright">
+    <div class="content">
+        <p>最后更新： 2019年05月09日 17:33</p>
+        <p>原始链接： <a class="post-url" href="/2019/05/08/Python_NLP_07/" title="Python自然语言处理07 从文本提取信息">https://ice-melt.github.io/2019/05/08/Python_NLP_07/</a></p>
+        <footer>
+            <a href="https://ice-melt.github.io">
+                <img src="/images/logo.png" alt="ice-melt">
+                ice-melt
+            </a>
+        </footer>
+    </div>
+</div>
+
+      
+        
+            
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;">赏</a>
+</div>
+
+<div id="reward" class="post-modal reward-lay">
+    <a class="close" href="javascript:;" id="reward-close">×</a>
+    <span class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        您的支持是我原创的动力
+        <i class="icon icon-quote-right"></i>
+    </span>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/images/wechat_code.jpg" alt="打赏二维码">
+        </div>
+        <div class="reward-select">
+            
+            <label class="reward-select-item checked" data-id="wechat" data-wechat="/images/wechat_code.jpg">
+                <img class="reward-select-item-wechat" src="/images/wechat.png" alt="微信">
+            </label>
+            
+            
+            <label class="reward-select-item" data-id="alipay" data-alipay="/images/alipay_code.jpg">
+                <img class="reward-select-item-alipay" src="/images/alipay.png" alt="支付宝">
+            </label>
+            
+        </div>
+    </div>
+</div>
+
+
+        
+    </div>
+    <footer class="article-footer">
+        
+        
+<div class="post-share">
+    <a href="javascript:;" id="share-sub" class="post-share-fab">
+        <i class="fa fa-share-alt"></i>
+    </a>
+    <div class="post-share-list" id="share-list">
+        <ul class="share-icons">
+          <li>
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/05/08/Python_NLP_07/&title=《Python自然语言处理07 从文本提取信息》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+              <i class="fa fa-weibo"></i>
+            </a>
+          </li>
+          <li>
+            <a class="weixin share-sns" id="wxFab" href="javascript:;" data-title="微信">
+              <i class="fa fa-weixin"></i>
+            </a>
+          </li>
+          <li>
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/05/08/Python_NLP_07/&title=《Python自然语言处理07 从文本提取信息》 — 夕兮曦兮的个人网站&source=本章回答下列问题:
+(1)如何能构建一个系统,以至从非结构化文本中提取结构化数据?
+(2)有哪些稳健的方法识别一个文本描述的实体和关系?
+(3)哪些语料库..." data-title="QQ">
+              <i class="fa fa-qq"></i>
+            </a>
+          </li>
+          <li>
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/05/08/Python_NLP_07/" data-title="Facebook">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理07 从文本提取信息》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/05/08/Python_NLP_07/&via=https://ice-melt.github.io" data-title="Twitter">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/05/08/Python_NLP_07/" data-title="Google+">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        </ul>
+     </div>
+</div>
+<div class="post-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;" id="wxShare-close">×</a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/05/08/Python_NLP_07/" alt="微信分享二维码">
+</div>
+
+<div class="mask"></div>
+
+        
+        <ul class="article-footer-menu">
+            
+            
+  <li class="article-footer-tags">
+    <i class="fa fa-tags"></i>
+      
+    <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
+      
+  </li>
+
+        </ul>
+        
+    </footer>
+  </div>
+</article>
+
+
+    <aside class="post-toc-pos post-toc-top" id="post-toc">
+        <nav class="post-toc-wrap">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-1-信息提取"><span class="post-toc-text">7.1 信息提取</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#信息提取结构"><span class="post-toc-text">信息提取结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-2-分块"><span class="post-toc-text">7.2 分块</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#名词短语分块"><span class="post-toc-text">名词短语分块</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#标记模式"><span class="post-toc-text">标记模式</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#用正则表达式分块"><span class="post-toc-text">用正则表达式分块</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#探索文本语料库"><span class="post-toc-text">探索文本语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#缝隙"><span class="post-toc-text">缝隙</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#分块的表示-标记与树状图"><span class="post-toc-text">分块的表示:标记与树状图</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-3-开发和评估分块器"><span class="post-toc-text">7.3 开发和评估分块器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#读取IOB格式与CoNLL2000分块语料库"><span class="post-toc-text">读取IOB格式与CoNLL2000分块语料库</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#简单评估和基准"><span class="post-toc-text">简单评估和基准</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#训练基于分类器的分块器"><span class="post-toc-text">训练基于分类器的分块器</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-4-语言结构中的递归"><span class="post-toc-text">7.4 语言结构中的递归</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#用级联分块器构建嵌套结构"><span class="post-toc-text">用级联分块器构建嵌套结构</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#树状图"><span class="post-toc-text">树状图</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#树遍历"><span class="post-toc-text">树遍历</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-5-命名实体识别"><span class="post-toc-text">7.5 命名实体识别</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-6-关系抽取"><span class="post-toc-text">7.6 关系抽取</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-7小结-略"><span class="post-toc-text">7.7小结(略)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-8深入阅读-略"><span class="post-toc-text">7.8深入阅读(略)</span></a></li></ol>
+        </nav>
+    </aside>
+    
+
+<nav id="article-nav">
+  
+    <a href="/2019/05/08/test/" id="article-nav-newer" class="article-nav-link-wrap">
+
+      <span class="article-nav-title">
+        <i class="fa fa-hand-o-left" aria-hidden="true"></i>
+        
+          test
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2019/05/06/Python_NLP_00/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Python自然语言处理 写在前面</span>
+      <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+    </a>
+  
+</nav>
+
+
+
+    
+        <div id="SOHUCS" sid="Python_NLP_07"></div>
+<script type="text/javascript">
+    (function(){
+        var appid = 'cytRPCpOX';
+        var conf = 'prod_1e65dc7b851067d2e5fa952e667c6b16';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+    
+</section>
+        
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+      <p>
+        Powered by  <a href="http://hexo.io/" target="_blank">Hexo</a>
+        Theme <a href="//github.com/wongminho/hexo-theme-miho" target="_blank">MiHo</a>
+      &copy; 2019 ice-melt<br>
+      </p>
+    </div>
+  </div>
+</footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  var mihoConfig = {
+      root: "https://ice-melt.github.io",
+      animate: true,
+      isHome: false,
+      share: true,
+      reward: 1
+  }
+</script>
+<div class="sidebar">
+    <div id="sidebar-search" title="Search">
+        <i class="fa fa-search"></i>
+    </div>
+    <div id="sidebar-category" title="Categories">
+        <i class="fa fa-book"></i>
+    </div>
+    <div id="sidebar-tag" title="Tags">
+        <i class="fa fa-tags"></i>
+    </div>
+    <div id="sidebar-top">
+        <span class="sidebar-top-icon"><i class="fa fa-angle-up"></i></span>
+    </div>
+</div>
+<div class="sidebar-menu-box" id="sidebar-menu-box">
+    <div class="sidebar-menu-box-container">
+        <div id="sidebar-menu-box-categories">
+            <a class="category-link" href="/categories/NLP/">NLP</a>
+        </div>
+        <div id="sidebar-menu-box-tags">
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+    <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
+</div>
+<div class="mobile-header-menu-nav" id="mobile-header-menu-nav">
+    <div class="mobile-header-menu-container">
+        <span class="title">Menus</span>
+        <ul class="mobile-header-menu-navbar">
+            
+            <li>
+                <a href="/">
+                    <i class="fa fa-home"></i><span>Home</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/archives">
+                    <i class="fa fa-archive"></i><span>Archives</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/about">
+                    <i class="fa fa-user"></i><span>About</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="mobile-header-tag-container">
+        <span class="title">Tags</span>
+        <div id="mobile-header-container-tags">
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+</div>
+<div class="search-wrap">
+    <span class="search-close">&times;</span>
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+            <i class="icon icon-lg icon-chevron-left"></i>
+        </a>
+        <input class="search-field" placeholder="Search..." id="keywords">
+        <a id="search-submit" href="javascript:;">
+            <i class="fa fa-search"></i>
+        </a>
+    <div class="search-container" id="search-container">
+        <ul class="search-result" id="search-result">
+        </ul>
+    </div>
+</div>
+
+<div id="search-tpl">
+    <li class="search-result-item">
+        <a href="{url}" class="search-item-li">
+            <span class="search-item-li-title" title="{title}">{title}</span>
+        </a>
+    </li>
+</div>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+
+
+  <script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles"></div>
+  <script src="/js/particles.js"></script>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  <script src="//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js"></script>
+  <script src="/js/animate.js"></script>
+
+
+  <script src="/js/pop-img.js"></script>
+  <script>
+     $(".article-entry p img").popImg();
+  </script>
+
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src>
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>test | 夕兮曦兮的个人网站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="keywords" content="ice-melt's Blog">
+  
+  <meta name="description" content="训练基于分类器的分块器无论是基于正则表达式的分块器还是n-gram分块器,创建什么样的分块完全取决于词性标记.然而,有时词性标记不足以确定一个句子应如何分块 12(3) a. Joey/NN sold/VBD the/DT farmer/NN rice/NN ./.	b. Nick/NN broke/VBD my/DT computer/NN monitor/NN ./. 考虑例句,两句话词性标记">
+<meta name="keywords" content="Python自然语言处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="test">
+<meta property="og:url" content="https://ice-melt.github.io/2019/05/08/test/index.html">
+<meta property="og:site_name" content="夕兮曦兮的个人网站">
+<meta property="og:description" content="训练基于分类器的分块器无论是基于正则表达式的分块器还是n-gram分块器,创建什么样的分块完全取决于词性标记.然而,有时词性标记不足以确定一个句子应如何分块 12(3) a. Joey/NN sold/VBD the/DT farmer/NN rice/NN ./.	b. Nick/NN broke/VBD my/DT computer/NN monitor/NN ./. 考虑例句,两句话词性标记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-05-09T09:30:35.244Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="test">
+<meta name="twitter:description" content="训练基于分类器的分块器无论是基于正则表达式的分块器还是n-gram分块器,创建什么样的分块完全取决于词性标记.然而,有时词性标记不足以确定一个句子应如何分块 12(3) a. Joey/NN sold/VBD the/DT farmer/NN rice/NN ./.	b. Nick/NN broke/VBD my/DT computer/NN monitor/NN ./. 考虑例句,两句话词性标记">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/pace.min.js"></script>
+  
+
+  
+  
+
+  
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+</head>
+</html>
+<body>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="container">
+      <header id="header">
+    <div id="banner"></div>
+    <div id="header-outer">
+        <div id="header-menu" class="header-menu-pos animated">
+            <div class="header-menu-container">
+                <a href="/" class="left">
+                    <span class="site-title">ice-melt&#39;s Blog</span>
+                </a>
+                <nav id="header-menu-nav" class="right">
+                    
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    
+                    <a href="/archives">
+                        <i class="fa fa-archive"></i>
+                        <span>Archives</span>
+                    </a>
+                    
+                    <a href="/about">
+                        <i class="fa fa-user"></i>
+                        <span>About</span>
+                    </a>
+                    
+                </nav>
+                <a class="mobile-header-menu-button">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+        </div>
+        <div id="header-row">
+            <div id="logo">
+                <a href="/">
+                    <img src="/images/logo.png" alt="logo">
+                </a>
+            </div>
+            <div class="header-info">
+                <div id="header-title">
+                    
+                    <h2>
+                        ice-melt&#39;s Blog
+                    </h2>
+                    
+                </div>
+                <div id="header-description">
+                    
+                    <h3>
+                        冰冻三尺 非一日之寒 积土成山 非斯须之作。
+                    </h3>
+                    
+                </div>
+            </div>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a title="ice-melt" target="_blank" href="https://ice-melt.github.io/">
+                            <i class="fa fa-home fa-2x"></i></a>
+                    
+                        <a title="Github" target="_blank" href="//github.com/ice-melt">
+                            <i class="fa fa-github fa-2x"></i></a>
+                    
+                        <a title="Weibo" target="_blank" href="//weibo.com/ice-melt">
+                            <i class="fa fa-weibo fa-2x"></i></a>
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+      <div class="outer">
+        <section id="main" class="body-wrap"><article id="post-test" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="post-title" itemprop="name">
+      test
+    </h1>
+    <div class="post-title-bar">
+      <ul>
+          
+              <li>
+                  <i class="fa fa-book"></i>
+                  
+                      <a href="/categories/NLP/">NLP</a>
+                  
+              </li>
+          
+        <li>
+          <i class="fa fa-calendar"></i>  2019-05-08
+        </li>
+        <li>
+          <i class="fa fa-eye"></i>
+          <span id="busuanzi_value_page_pv"></span>
+        </li>
+      </ul>
+    </div>
+  
+
+          
+      </header>
+    
+    <div class="article-entry post-content" itemprop="articleBody">
+      
+            
+            <h4 id="训练基于分类器的分块器"><a href="#训练基于分类器的分块器" class="headerlink" title="训练基于分类器的分块器"></a>训练基于分类器的分块器</h4><p>无论是基于正则表达式的分块器还是n-gram分块器,创建什么样的分块完全取决于词性标记.<br>然而,有时词性标记不足以确定一个句子应如何分块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(3) a. Joey/NN sold/VBD the/DT farmer/NN rice/NN ./.</span><br><span class="line">	b. Nick/NN broke/VBD my/DT computer/NN monitor/NN ./.</span><br></pre></td></tr></table></figure>
+<p>考虑例句,两句话词性标记相同,但分块方式不同</p>
+<p>第一句中,the farmer 和 rice 都是单独分块<br>第二句中,my computer monitor 是单独的分块<br>如果想最大限度的提升分块的性能,需要使用词的内容作为词性标记的补充.</p>
+<p>包含词的内容信息的一种方法是使用基于分类器的标注器对句子分块.<br>比如使用n-gram分块器,这个基于分类器器分块器分配IOB标记给句子中的词,<br>然后将这些标记转换为块.</p>
+<blockquote>
+<p>本小节示例需要安装 oCaml   </p>
+</blockquote>
+<p>使用连续分类器对名词短语分块<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-4-语言结构中的递归"><a href="#7-4-语言结构中的递归" class="headerlink" title="7.4 语言结构中的递归"></a>7.4 语言结构中的递归</h3><h4 id="用级联分块器构建嵌套结构"><a href="#用级联分块器构建嵌套结构" class="headerlink" title="用级联分块器构建嵌套结构"></a>用级联分块器构建嵌套结构</h4><p>只需创建一个包含递归规则的多级的分块语法,就可以建立任意深度的分块结构</p>
+<p>例子展示名词短语、介词短语、动词短语和句子的模式<br>这是一个4级分块语法器,可以用来创建深度最深为4的结构<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">grammar = <span class="string">r"""</span></span><br><span class="line"><span class="string">   NP: &#123;&lt;DT|JJ|NN.*&gt;+&#125;</span></span><br><span class="line"><span class="string">   PP: &#123;&lt;IN&gt;&lt;NP&gt;&#125;</span></span><br><span class="line"><span class="string">   VP: &#123;&lt;VB.*&gt;&lt;NP|PP|CLAUSE&gt;+$&#125;</span></span><br><span class="line"><span class="string">   CLAUSE: &#123;&lt;NP&gt;&lt;VP&gt;&#125;</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">cp = nltk.RegexpParser(grammar)</span><br><span class="line">sentence = [(<span class="string">"Mary"</span>, <span class="string">"NN"</span>), (<span class="string">"saw"</span>, <span class="string">"VBD"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"cat"</span>, <span class="string">"NN"</span>), (<span class="string">"sit"</span>, <span class="string">"VB"</span>), (<span class="string">"on"</span>, <span class="string">"IN"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>),</span><br><span class="line">            (<span class="string">"mat"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">print(cp.parse(sentence))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP Mary/NN)</span></span><br><span class="line"><span class="string">  saw/VBD</span></span><br><span class="line"><span class="string">  (CLAUSE</span></span><br><span class="line"><span class="string">    (NP the/DT cat/NN)</span></span><br><span class="line"><span class="string">    (VP sit/VB (PP on/IN (NP the/DT mat/NN)))))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>结果丢掉了以saw为首的VP<br>将此分块器应用到有更深嵌套的句子中,无法识别开始的VP块,如下例:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sentence = [(<span class="string">"John"</span>, <span class="string">"NNP"</span>), (<span class="string">"thinks"</span>, <span class="string">"VBZ"</span>), (<span class="string">"Mary"</span>, <span class="string">"NN"</span>),</span><br><span class="line">            (<span class="string">"saw"</span>, <span class="string">"VBD"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"cat"</span>, <span class="string">"NN"</span>), (<span class="string">"sit"</span>, <span class="string">"VB"</span>),</span><br><span class="line">            (<span class="string">"on"</span>, <span class="string">"IN"</span>), (<span class="string">"the"</span>, <span class="string">"DT"</span>), (<span class="string">"mat"</span>, <span class="string">"NN"</span>)]</span><br><span class="line">print(cp.parse(sentence))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP John/NNP)</span></span><br><span class="line"><span class="string">  thinks/VBZ</span></span><br><span class="line"><span class="string">  (NP Mary/NN)</span></span><br><span class="line"><span class="string">  saw/VBD</span></span><br><span class="line"><span class="string">  (CLAUSE</span></span><br><span class="line"><span class="string">    (NP the/DT cat/NN)</span></span><br><span class="line"><span class="string">    (VP sit/VB (PP on/IN (NP the/DT mat/NN)))))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p>解决方案: 添加loop参数,指定模式应该循环次数,让分块器在他的模式中循环<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cp = nltk.RegexpParser(grammar, loop=<span class="number">2</span>)  <span class="comment"># 添加循环</span></span><br><span class="line">print(cp.parse(sentence))</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">(S</span></span><br><span class="line"><span class="string">  (NP John/NNP)</span></span><br><span class="line"><span class="string">  thinks/VBZ</span></span><br><span class="line"><span class="string">  (CLAUSE</span></span><br><span class="line"><span class="string">    (NP Mary/NN)</span></span><br><span class="line"><span class="string">    (VP</span></span><br><span class="line"><span class="string">      saw/VBD</span></span><br><span class="line"><span class="string">      (CLAUSE</span></span><br><span class="line"><span class="string">        (NP the/DT cat/NN)</span></span><br><span class="line"><span class="string">        (VP sit/VB (PP on/IN (NP the/DT mat/NN)))))))</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="树状图"><a href="#树状图" class="headerlink" title="树状图"></a>树状图</h4><p>在NLTK中,创建树状图,方法是给节点添加标签和一个子链表</p>
+<p><code>tree = nltk.Tree(&#39;NP&#39;,[&#39;the&#39;,&#39;rabbit&#39;])</code></p>
+<p>tree的一些方法:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(tree[1])</span><br><span class="line">tree.node</span><br><span class="line">tree.leaves()</span><br><span class="line">tree.draw()</span><br></pre></td></tr></table></figure></p>
+<h4 id="树遍历"><a href="#树遍历" class="headerlink" title="树遍历"></a>树遍历</h4><p>使用递归函数来遍历树<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>书中例子会报<code>TypeError: Tree: Expected a node value and child list</code> 错误</p>
+</blockquote>
+<h3 id="7-5-命名实体识别"><a href="#7-5-命名实体识别" class="headerlink" title="7.5 命名实体识别"></a>7.5 命名实体识别</h3><center bgcolor="#f1f1f1">表 7-3 常用命名实体类型</center>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">NE类型</th>
+<th style="text-align:left">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">组织(ORGANIZATION)</td>
+<td style="text-align:left">Georgia-Pacific Corp., WHO</td>
+</tr>
+<tr>
+<td style="text-align:left">人(PERSON)</td>
+<td style="text-align:left">Eddy Bonte, President Obama</td>
+</tr>
+<tr>
+<td style="text-align:left">地点(LOCATION)</td>
+<td style="text-align:left">Murray River, Mount Everest</td>
+</tr>
+<tr>
+<td style="text-align:left">日期(DATE)</td>
+<td style="text-align:left">June, 2008-06-29</td>
+</tr>
+<tr>
+<td style="text-align:left">时间(TIME)</td>
+<td style="text-align:left">two fifty a m, 1:30 p.m.</td>
+</tr>
+<tr>
+<td style="text-align:left">货币(MONEY)</td>
+<td style="text-align:left">175 million Canadian Dollars, GBP 10.40</td>
+</tr>
+<tr>
+<td style="text-align:left">百分数(PERCENT)</td>
+<td style="text-align:left">twenty pct, 18.75 %</td>
+</tr>
+<tr>
+<td style="text-align:left">设施(FACILITY)</td>
+<td style="text-align:left">Washington Monument, Stonehenge</td>
+</tr>
+<tr>
+<td style="text-align:left">地缘政治实体(GPE South)</td>
+<td style="text-align:left">East Asia, Midlothian</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>命名实体识别(<code>NER</code>)</strong>系统的目标是识别所有文字提及的命名实体。</p>
+<p>这可以分解成两个子任务:<strong>确定NE的边界</strong>和<strong>确定其类型</strong>。</p>
+<p>命名实体识别经常是信息提取中关系识别的前奏,也有助于其他任务。例如:在问答系统(QA)中,我们试图提高信息检索的精确度,不用返回整个页面而只是包含用户问题的答案的那部分。大多数QA系统利用标准信息检索返回的文件,然后尝试分离文档中包含答案的最小的文本分段。</p>
+<p>假设问题:<code>Who was the first President of the US?</code><br>被检索的文档中包含答案,如下:</p>
+<pre><code>(5) The Washington Monument is the most prominent structure in Washington,
+D.C. and one of the city’s early attractions. It was built in honor of George
+Washington, who led the country to independence and then became its first
+President.
+</code></pre><p>我们想得到的答案应该是<code>X was the first President of the US</code>的形式,其中<code>X</code>不仅是一个名词短语也是一个PER类型的命名实体。</p>
+<p>识别命名实体可以通过查找适当的名称列表(如识别地点时,可以使用地名词典),但盲目这样做会出问题,比如人或组织名词的列表无法完全覆盖,另外许多实体措辞有歧义,如May和North可能是日期和地点,也有可能都是人名.<br>更大的挑战来自如’Stanford University’这样的多词名词和包含其他名词的名称,因此我们需要能够识别多标识符序列的开头和结尾</p>
+<p>NER是一个非常适合用于分类器类型的方法。</p>
+<p>NLTK提供了一个已经训练好的可以识别命名实体的分类器,使用函数nltk.ne_chunk()访问。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">sent = nltk.corpus.treebank.tagged_sents()[<span class="number">22</span>]</span><br><span class="line"><span class="comment"># 如果设置参数binary=True,那么命名实体只被标注为NE,否则,分类器会添加类型标签,如 PERSON, ORGANIZATION and GPE 等</span></span><br><span class="line">print(nltk.ne_chunk(sent, binary=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># (S</span></span><br><span class="line"><span class="comment">#   The/DT</span></span><br><span class="line"><span class="comment">#   (NE U.S./NNP)</span></span><br><span class="line"><span class="comment">#   is/VBZ</span></span><br><span class="line"><span class="comment">#   one/CD</span></span><br><span class="line"><span class="comment">#   ....</span></span><br><span class="line"><span class="comment">#   according/VBG</span></span><br><span class="line"><span class="comment">#   to/TO</span></span><br><span class="line"><span class="comment">#   (NE Brooke/NNP)</span></span><br><span class="line"><span class="comment">#   ...)</span></span><br><span class="line">print(nltk.ne_chunk(sent))  <span class="comment"># PERSON, ORGANIZATION and GPE</span></span><br><span class="line"><span class="comment"># (S</span></span><br><span class="line"><span class="comment">#   The/DT</span></span><br><span class="line"><span class="comment">#   (GPE U.S./NNP)</span></span><br><span class="line"><span class="comment">#   is/VBZ</span></span><br><span class="line"><span class="comment">#   one/CD</span></span><br><span class="line"><span class="comment">#   ......</span></span><br><span class="line"><span class="comment">#   according/VBG</span></span><br><span class="line"><span class="comment">#   to/TO</span></span><br><span class="line"><span class="comment">#   (PERSON Brooke/NNP T./NNP Mossman/NNP)</span></span><br><span class="line"><span class="comment">#   ....)</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-6-关系抽取"><a href="#7-6-关系抽取" class="headerlink" title="7.6 关系抽取"></a>7.6 关系抽取</h3><p>只要文本中的命名实体被识别,就可以提取它们之间存在的关系。</p>
+<p>关系抽取的方法是首先寻找所有(X, $\alpha$, Y)形式的三元组,其中X和Y是指定类型的命名实体,$\alpha$表示X和Y之间关系的字符串</p>
+<p>搜索包含词 in 的字符串,正则表达式会忽略动名词前为in的字符串(否定预测先行断言)<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line">IN = re.compile(<span class="string">r'.*\bin\b(?!\b.+ing)'</span>)</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> nltk.corpus.ieer.parsed_docs(<span class="string">'NYT_19980315'</span>):</span><br><span class="line">    <span class="keyword">for</span> rel <span class="keyword">in</span> nltk.sem.extract_rels(<span class="string">'ORG'</span>, <span class="string">'LOC'</span>, doc, corpus=<span class="string">'ieer'</span>, pattern=IN):</span><br><span class="line">        print(nltk.sem.relextract.rtuple(rel))</span><br><span class="line"></span><br><span class="line"><span class="comment"># [ORG: 'WHYY'] 'in' [LOC: 'Philadelphia']</span></span><br><span class="line"><span class="comment"># [ORG: 'McGlashan &amp;AMP; Sarrail'] 'firm in' [LOC: 'San Mateo']</span></span><br><span class="line"><span class="comment"># [ORG: 'Freedom Forum'] 'in' [LOC: 'Arlington']</span></span><br><span class="line"><span class="comment"># [ORG: 'Brookings Institution'] ', the research group in' [LOC: 'Washington']</span></span><br><span class="line"><span class="comment"># [ORG: 'Idealab'] ', a self-described business incubator based in' [LOC: 'Los Angeles']</span></span><br><span class="line"><span class="comment"># [ORG: 'Open Text'] ', based in' [LOC: 'Waterloo']</span></span><br><span class="line"><span class="comment"># [ORG: 'WGBH'] 'in' [LOC: 'Boston']</span></span><br><span class="line"><span class="comment"># [ORG: 'Bastille Opera'] 'in' [LOC: 'Paris']</span></span><br><span class="line"><span class="comment"># [ORG: 'Omnicom'] 'in' [LOC: 'New York']</span></span><br><span class="line"><span class="comment"># [ORG: 'DDB Needham'] 'in' [LOC: 'New York']</span></span><br><span class="line"><span class="comment"># [ORG: 'Kaplan Thaler Group'] 'in' [LOC: 'New York']</span></span><br><span class="line"><span class="comment"># [ORG: 'BBDO South'] 'in' [LOC: 'Atlanta']</span></span><br><span class="line"><span class="comment"># [ORG: 'Georgia-Pacific'] 'in' [LOC: 'Atlanta']</span></span><br></pre></td></tr></table></figure></p>
+<p>荷兰语的命名实体语料库<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> conll2002</span><br><span class="line"></span><br><span class="line">vnv = <span class="string">"""</span></span><br><span class="line"><span class="string">(</span></span><br><span class="line"><span class="string">is/V| # 3rd sing present and</span></span><br><span class="line"><span class="string">was/V| # past forms of the verb zijn ('be')</span></span><br><span class="line"><span class="string">werd/V| # and also present</span></span><br><span class="line"><span class="string">wordt/V # past of worden ('become')</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string">.* # followed by anything</span></span><br><span class="line"><span class="string">van/Prep # followed by van ('of')</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line">VAN = re.compile(vnv, re.VERBOSE)</span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> conll2002.chunked_sents(<span class="string">'ned.train'</span>):</span><br><span class="line">    <span class="keyword">for</span> r <span class="keyword">in</span> nltk.sem.extract_rels(<span class="string">'PER'</span>, <span class="string">'ORG'</span>, doc, corpus=<span class="string">'conll2002'</span>, pattern=VAN):</span><br><span class="line">        print(nltk.sem.relextract.clause(r, relsym=<span class="string">"VAN"</span>))</span><br><span class="line"><span class="comment"># VAN("cornet_d'elzius", 'buitenlandse_handel')</span></span><br><span class="line"><span class="comment"># VAN('johan_rottiers', 'kardinaal_van_roey_instituut')</span></span><br><span class="line"><span class="comment"># VAN('annie_lennox', 'eurythmics')</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> doc <span class="keyword">in</span> conll2002.chunked_sents(<span class="string">'ned.train'</span>):</span><br><span class="line">    <span class="keyword">for</span> r <span class="keyword">in</span> nltk.sem.extract_rels(<span class="string">'PER'</span>, <span class="string">'ORG'</span>, doc, corpus=<span class="string">'conll2002'</span>, pattern=VAN):</span><br><span class="line">        print(nltk.sem.relextract.rtuple(r, lcon=<span class="literal">True</span>, rcon=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># ...'')[PER: "Cornet/V d'Elzius/N"] 'is/V op/Prep dit/Pron ogenblik/N kabinetsadviseur/N van/Prep staatssecretaris/N voor/Prep' [ORG: 'Buitenlandse/N Handel/N'](''...</span></span><br><span class="line"><span class="comment"># ...'')[PER: 'Johan/N Rottiers/N'] 'is/V informaticacoördinator/N van/Prep het/Art' [ORG: 'Kardinaal/N Van/N Roey/N Instituut/N']('in/Prep'...</span></span><br><span class="line"><span class="comment"># ...'Door/Prep rugproblemen/N van/Prep zangeres/N')[PER: 'Annie/N Lennox/N'] 'wordt/V het/Art concert/N van/Prep' [ORG: 'Eurythmics/N']('vandaag/Adv in/Prep'...</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="7-7小结-略"><a href="#7-7小结-略" class="headerlink" title="7.7小结(略)"></a>7.7小结(略)</h3><h3 id="7-8深入阅读-略"><a href="#7-8深入阅读-略" class="headerlink" title="7.8深入阅读(略)"></a>7.8深入阅读(略)</h3>
+            <div class="post-copyright">
+    <div class="content">
+        <p>最后更新： 2019年05月09日 17:30</p>
+        <p>原始链接： <a class="post-url" href="/2019/05/08/test/" title="test">https://ice-melt.github.io/2019/05/08/test/</a></p>
+        <footer>
+            <a href="https://ice-melt.github.io">
+                <img src="/images/logo.png" alt="ice-melt">
+                ice-melt
+            </a>
+        </footer>
+    </div>
+</div>
+
+      
+        
+            
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;">赏</a>
+</div>
+
+<div id="reward" class="post-modal reward-lay">
+    <a class="close" href="javascript:;" id="reward-close">×</a>
+    <span class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        您的支持是我原创的动力
+        <i class="icon icon-quote-right"></i>
+    </span>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/images/wechat_code.jpg" alt="打赏二维码">
+        </div>
+        <div class="reward-select">
+            
+            <label class="reward-select-item checked" data-id="wechat" data-wechat="/images/wechat_code.jpg">
+                <img class="reward-select-item-wechat" src="/images/wechat.png" alt="微信">
+            </label>
+            
+            
+            <label class="reward-select-item" data-id="alipay" data-alipay="/images/alipay_code.jpg">
+                <img class="reward-select-item-alipay" src="/images/alipay.png" alt="支付宝">
+            </label>
+            
+        </div>
+    </div>
+</div>
+
+
+        
+    </div>
+    <footer class="article-footer">
+        
+        
+<div class="post-share">
+    <a href="javascript:;" id="share-sub" class="post-share-fab">
+        <i class="fa fa-share-alt"></i>
+    </a>
+    <div class="post-share-list" id="share-list">
+        <ul class="share-icons">
+          <li>
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/05/08/test/&title=《test》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+              <i class="fa fa-weibo"></i>
+            </a>
+          </li>
+          <li>
+            <a class="weixin share-sns" id="wxFab" href="javascript:;" data-title="微信">
+              <i class="fa fa-weixin"></i>
+            </a>
+          </li>
+          <li>
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/05/08/test/&title=《test》 — 夕兮曦兮的个人网站&source=" data-title="QQ">
+              <i class="fa fa-qq"></i>
+            </a>
+          </li>
+          <li>
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/05/08/test/" data-title="Facebook">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《test》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/05/08/test/&via=https://ice-melt.github.io" data-title="Twitter">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/05/08/test/" data-title="Google+">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        </ul>
+     </div>
+</div>
+<div class="post-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;" id="wxShare-close">×</a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/05/08/test/" alt="微信分享二维码">
+</div>
+
+<div class="mask"></div>
+
+        
+        <ul class="article-footer-menu">
+            
+            
+  <li class="article-footer-tags">
+    <i class="fa fa-tags"></i>
+      
+    <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
+      
+  </li>
+
+        </ul>
+        
+    </footer>
+  </div>
+</article>
+
+
+    <aside class="post-toc-pos post-toc-top" id="post-toc">
+        <nav class="post-toc-wrap">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#训练基于分类器的分块器"><span class="post-toc-text">训练基于分类器的分块器</span></a></li></ol><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-4-语言结构中的递归"><span class="post-toc-text">7.4 语言结构中的递归</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#用级联分块器构建嵌套结构"><span class="post-toc-text">用级联分块器构建嵌套结构</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#树状图"><span class="post-toc-text">树状图</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#树遍历"><span class="post-toc-text">树遍历</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-5-命名实体识别"><span class="post-toc-text">7.5 命名实体识别</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-6-关系抽取"><span class="post-toc-text">7.6 关系抽取</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-7小结-略"><span class="post-toc-text">7.7小结(略)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-8深入阅读-略"><span class="post-toc-text">7.8深入阅读(略)</span></a>
+        </li></nav>
+    </aside>
+    
+
+<nav id="article-nav">
+  
+    <a href="/2019/05/09/Python_NLP_08/" id="article-nav-newer" class="article-nav-link-wrap">
+
+      <span class="article-nav-title">
+        <i class="fa fa-hand-o-left" aria-hidden="true"></i>
+        
+          Python自然语言处理08 分析句子结构
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2019/05/08/Python_NLP_07/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Python自然语言处理07 从文本提取信息</span>
+      <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+    </a>
+  
+</nav>
+
+
+
+    
+        <div id="SOHUCS" sid="test"></div>
+<script type="text/javascript">
+    (function(){
+        var appid = 'cytRPCpOX';
+        var conf = 'prod_1e65dc7b851067d2e5fa952e667c6b16';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+    
+</section>
+        
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+      <p>
+        Powered by  <a href="http://hexo.io/" target="_blank">Hexo</a>
+        Theme <a href="//github.com/wongminho/hexo-theme-miho" target="_blank">MiHo</a>
+      &copy; 2019 ice-melt<br>
+      </p>
+    </div>
+  </div>
+</footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  var mihoConfig = {
+      root: "https://ice-melt.github.io",
+      animate: true,
+      isHome: false,
+      share: true,
+      reward: 1
+  }
+</script>
+<div class="sidebar">
+    <div id="sidebar-search" title="Search">
+        <i class="fa fa-search"></i>
+    </div>
+    <div id="sidebar-category" title="Categories">
+        <i class="fa fa-book"></i>
+    </div>
+    <div id="sidebar-tag" title="Tags">
+        <i class="fa fa-tags"></i>
+    </div>
+    <div id="sidebar-top">
+        <span class="sidebar-top-icon"><i class="fa fa-angle-up"></i></span>
+    </div>
+</div>
+<div class="sidebar-menu-box" id="sidebar-menu-box">
+    <div class="sidebar-menu-box-container">
+        <div id="sidebar-menu-box-categories">
+            <a class="category-link" href="/categories/NLP/">NLP</a>
+        </div>
+        <div id="sidebar-menu-box-tags">
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+    <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
+</div>
+<div class="mobile-header-menu-nav" id="mobile-header-menu-nav">
+    <div class="mobile-header-menu-container">
+        <span class="title">Menus</span>
+        <ul class="mobile-header-menu-navbar">
+            
+            <li>
+                <a href="/">
+                    <i class="fa fa-home"></i><span>Home</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/archives">
+                    <i class="fa fa-archive"></i><span>Archives</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="/about">
+                    <i class="fa fa-user"></i><span>About</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="mobile-header-tag-container">
+        <span class="title">Tags</span>
+        <div id="mobile-header-container-tags">
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+        </div>
+    </div>
+</div>
+<div class="search-wrap">
+    <span class="search-close">&times;</span>
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+            <i class="icon icon-lg icon-chevron-left"></i>
+        </a>
+        <input class="search-field" placeholder="Search..." id="keywords">
+        <a id="search-submit" href="javascript:;">
+            <i class="fa fa-search"></i>
+        </a>
+    <div class="search-container" id="search-container">
+        <ul class="search-result" id="search-result">
+        </ul>
+    </div>
+</div>
+
+<div id="search-tpl">
+    <li class="search-result-item">
+        <a href="{url}" class="search-item-li">
+            <span class="search-item-li-title" title="{title}">{title}</span>
+        </a>
+    </li>
+</div>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+
+
+  <script src="//cdn.bootcss.com/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles"></div>
+  <script src="/js/particles.js"></script>
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  <script src="//cdn.bootcss.com/scrollReveal.js/3.0.5/scrollreveal.js"></script>
+  <script src="/js/animate.js"></script>
+
+
+  <script src="/js/pop-img.js"></script>
+  <script>
+     $(".article-entry p img").popImg();
+  </script>
+
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src>
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+</body>
+</html>

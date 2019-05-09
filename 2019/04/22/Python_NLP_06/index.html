@@ -9,7 +9,7 @@
     <meta name="keywords" content="ice-melt's Blog">
   
   <meta name="description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
-<meta name="keywords" content="Python自然语言处理,NLP">
+<meta name="keywords" content="Python自然语言处理">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python自然语言处理06 学习分类文本">
 <meta property="og:url" content="https://ice-melt.github.io/2019/04/22/Python_NLP_06/index.html">
@@ -17,7 +17,7 @@
 <meta property="og:description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190506154303588.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9pY2UtbWVsdC5ibG9nLmNzZG4ubmV0,size_16,color_FFFFFF,t_70">
-<meta property="og:updated_time" content="2019-05-08T06:07:31.094Z">
+<meta property="og:updated_time" content="2019-05-09T04:37:18.041Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python自然语言处理06 学习分类文本">
 <meta name="twitter:description" content="模式识别是自然语言处理的一个核心部分.  以-ed结尾的词往往是过去时态动词(ref 5 chapter) 频繁使用will暗示这是新闻文本(ref 3 chapter)  可观察到的模式(词的结构和词频)恰好与特定方面的含义相关联,如时态,主题等. 我们如何知道从哪里开始寻找,哪一方面的形式与哪一方面的含义相关联? 本章回答如下问题:  怎样识别语言数据中明显用于分类的特征? 怎样构建用于自动执">
@@ -143,6 +143,13 @@ MathJax.Hub.Queue(function() {
     </h1>
     <div class="post-title-bar">
       <ul>
+          
+              <li>
+                  <i class="fa fa-book"></i>
+                  
+                      <a href="/categories/NLP/">NLP</a>
+                  
+              </li>
           
         <li>
           <i class="fa fa-calendar"></i>  2019-04-22
@@ -285,7 +292,7 @@ MathJax.Hub.Queue(function() {
 
             <div class="post-copyright">
     <div class="content">
-        <p>最后更新： 2019年05月08日 14:07</p>
+        <p>最后更新： 2019年05月09日 12:37</p>
         <p>原始链接： <a class="post-url" href="/2019/04/22/Python_NLP_06/" title="Python自然语言处理06 学习分类文本">https://ice-melt.github.io/2019/04/22/Python_NLP_06/</a></p>
         <footer>
             <a href="https://ice-melt.github.io">
@@ -395,8 +402,6 @@ MathJax.Hub.Queue(function() {
       
     <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
       
-    <a href="/tags/NLP/" class="color4">NLP</a>
-      
   </li>
 
         </ul>
@@ -426,7 +431,7 @@ MathJax.Hub.Queue(function() {
     </a>
   
   
-    <a href="/2019/04/18/Python-NLP-05/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2019/04/18/Python_NLP_05/" id="article-nav-older" class="article-nav-link-wrap">
       <span class="article-nav-title">Python自然语言处理05 分类和标注词汇</span>
       <i class="fa fa-hand-o-right" aria-hidden="true"></i>
     </a>
@@ -498,10 +503,10 @@ MathJax.Hub.Queue(function() {
 <div class="sidebar-menu-box" id="sidebar-menu-box">
     <div class="sidebar-menu-box-container">
         <div id="sidebar-menu-box-categories">
-            
+            <a class="category-link" href="/categories/NLP/">NLP</a>
         </div>
         <div id="sidebar-menu-box-tags">
-            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
         </div>
     </div>
     <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
@@ -534,7 +539,7 @@ MathJax.Hub.Queue(function() {
     <div class="mobile-header-tag-container">
         <span class="title">Tags</span>
         <div id="mobile-header-container-tags">
-            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
         </div>
     </div>
 </div>
@@ -584,6 +589,23 @@ MathJax.Hub.Queue(function() {
      $(".article-entry p img").popImg();
   </script>
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src>
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
 </body>
 </html>

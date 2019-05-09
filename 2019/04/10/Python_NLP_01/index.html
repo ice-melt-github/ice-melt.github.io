@@ -9,14 +9,14 @@
     <meta name="keywords" content="ice-melt's Blog">
   
   <meta name="description" content="前言">
-<meta name="keywords" content="Python自然语言处理,NLP">
+<meta name="keywords" content="Python自然语言处理">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python自然语言处理01 语言处理与Python">
-<meta property="og:url" content="https://ice-melt.github.io/2019/04/10/Python-NLP-01/index.html">
+<meta property="og:url" content="https://ice-melt.github.io/2019/04/10/Python_NLP_01/index.html">
 <meta property="og:site_name" content="夕兮曦兮的个人网站">
 <meta property="og:description" content="前言">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-05-08T06:07:15.101Z">
+<meta property="og:updated_time" content="2019-05-09T04:35:45.793Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python自然语言处理01 语言处理与Python">
 <meta name="twitter:description" content="前言">
@@ -130,7 +130,7 @@ MathJax.Hub.Queue(function() {
     </div>
 </header>
       <div class="outer">
-        <section id="main" class="body-wrap"><article id="post-Python-NLP-01" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main" class="body-wrap"><article id="post-Python_NLP_01" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
@@ -141,6 +141,13 @@ MathJax.Hub.Queue(function() {
     </h1>
     <div class="post-title-bar">
       <ul>
+          
+              <li>
+                  <i class="fa fa-book"></i>
+                  
+                      <a href="/categories/NLP/">NLP</a>
+                  
+              </li>
           
         <li>
           <i class="fa fa-calendar"></i>  2019-04-10
@@ -171,7 +178,8 @@ MathJax.Hub.Queue(function() {
 <h4 id="词语搭配和双连词"><a href="#词语搭配和双连词" class="headerlink" title="词语搭配和双连词"></a>词语搭配和双连词</h4><p><strong>搭配</strong>是不经常在一起出现的词序列<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取词对</span></span><br><span class="line">bigrams([<span class="string">'more'</span>,<span class="string">'is'</span>,<span class="string">'said'</span>,<span class="string">'than'</span>,<span class="string">'done'</span>,<span class="string">'!'</span>])</span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string"><span class="meta">&gt;&gt;&gt; </span>list(bigrams(['more','is','said','than','done','!']))</span></span><br><span class="line"><span class="string">[('more', 'is'), ('is', 'said'), ('said', 'than'), ('than', 'done'), ('done', '!')]</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="comment"># 找到出现频率比预期频率更频繁的双联词</span></span><br><span class="line">text4.collocations()</span><br></pre></td></tr></table></figure></p>
 <h4 id="计算其他东西"><a href="#计算其他东西" class="headerlink" title="计算其他东西"></a>计算其他东西</h4><p>除了计算词汇外,还可以计算词长等</p>
 <blockquote>
-<h5 id="表1-2-NLTK频率分布类中定义的函数"><a href="#表1-2-NLTK频率分布类中定义的函数" class="headerlink" title="表1-2   NLTK频率分布类中定义的函数"></a>表1-2   NLTK频率分布类中定义的函数</h5></blockquote>
+<p> 表1-2   NLTK频率分布类中定义的函数</p>
+</blockquote>
 <div class="table-container">
 <table>
 <thead>
@@ -233,54 +241,8 @@ MathJax.Hub.Queue(function() {
 </table>
 </div>
 <h3 id="1-4-回到Python-决策与控制"><a href="#1-4-回到Python-决策与控制" class="headerlink" title="1.4 回到Python:决策与控制"></a>1.4 回到Python:决策与控制</h3><blockquote>
-<h5 id="表1-3-数值比较运算符-略"><a href="#表1-3-数值比较运算符-略" class="headerlink" title="表1-3 数值比较运算符(略)"></a>表1-3 数值比较运算符(略)</h5><h5 id="表1-4-词汇比较运算符"><a href="#表1-4-词汇比较运算符" class="headerlink" title="表1-4 词汇比较运算符"></a>表1-4 词汇比较运算符</h5><div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:left">函数</th>
-<th style="text-align:left">含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">s.startswith(t)</td>
-<td style="text-align:left">测试s是否以t开头</td>
-</tr>
-<tr>
-<td style="text-align:left">s.endswith(t)</td>
-<td style="text-align:left">测试s是否以t结尾</td>
-</tr>
-<tr>
-<td style="text-align:left">t in s</td>
-<td style="text-align:left">测试s是否包含t</td>
-</tr>
-<tr>
-<td style="text-align:left">s.islower()</td>
-<td style="text-align:left">测试s中所有字符是否都是小写字母</td>
-</tr>
-<tr>
-<td style="text-align:left">s.isupper()</td>
-<td style="text-align:left">测试s中所有字符是否都是大写字母</td>
-</tr>
-<tr>
-<td style="text-align:left">s.isalpha()</td>
-<td style="text-align:left">测试s中所有字符是否都是字母</td>
-</tr>
-<tr>
-<td style="text-align:left">s.isalnum()</td>
-<td style="text-align:left">测试s中所有字符是否都是字母或数字</td>
-</tr>
-<tr>
-<td style="text-align:left">s.isdigit()</td>
-<td style="text-align:left">测试s中所有字符是否都是数字</td>
-</tr>
-<tr>
-<td style="text-align:left">s.istitle()</td>
-<td style="text-align:left">测试s是否首字母大写(s中的所有词都首字母大写)</td>
-</tr>
-</tbody>
-</table>
-</div>
+<p> 表1-3 数值比较运算符(略)</p>
+<p> 表1-4 词汇比较运算符<br>|函数|含义|<br>|:-|:-|<br>|s.startswith(t)    |测试s是否以t开头<br>|s.endswith(t)        |测试s是否以t结尾<br>|t in s                |测试s是否包含t<br>|s.islower()        |测试s中所有字符是否都是小写字母<br>|s.isupper()        |测试s中所有字符是否都是大写字母<br>|s.isalpha()        |测试s中所有字符是否都是字母<br>|s.isalnum()        |测试s中所有字符是否都是字母或数字<br>|s.isdigit()        |测试s中所有字符是否都是数字<br>|s.istitle()        |测试s是否首字母大写(s中的所有词都首字母大写)</p>
 </blockquote>
 <h4 id="对每个元素进行操作"><a href="#对每个元素进行操作" class="headerlink" title="对每个元素进行操作"></a>对每个元素进行操作</h4><p>处理</p>
 <ul>
@@ -311,8 +273,8 @@ MathJax.Hub.Queue(function() {
 
             <div class="post-copyright">
     <div class="content">
-        <p>最后更新： 2019年05月08日 14:07</p>
-        <p>原始链接： <a class="post-url" href="/2019/04/10/Python-NLP-01/" title="Python自然语言处理01 语言处理与Python">https://ice-melt.github.io/2019/04/10/Python-NLP-01/</a></p>
+        <p>最后更新： 2019年05月09日 12:35</p>
+        <p>原始链接： <a class="post-url" href="/2019/04/10/Python_NLP_01/" title="Python自然语言处理01 语言处理与Python">https://ice-melt.github.io/2019/04/10/Python_NLP_01/</a></p>
         <footer>
             <a href="https://ice-melt.github.io">
                 <img src="/images/logo.png" alt="ice-melt">
@@ -369,7 +331,7 @@ MathJax.Hub.Queue(function() {
     <div class="post-share-list" id="share-list">
         <ul class="share-icons">
           <li>
-            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/04/10/Python-NLP-01/&title=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
+            <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://ice-melt.github.io/2019/04/10/Python_NLP_01/&title=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&pic=https://ice-melt.github.ioimages/logo.png" data-title="微博">
               <i class="fa fa-weibo"></i>
             </a>
           </li>
@@ -379,22 +341,22 @@ MathJax.Hub.Queue(function() {
             </a>
           </li>
           <li>
-            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/04/10/Python-NLP-01/&title=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&source=前言" data-title="QQ">
+            <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://ice-melt.github.io/2019/04/10/Python_NLP_01/&title=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&source=前言" data-title="QQ">
               <i class="fa fa-qq"></i>
             </a>
           </li>
           <li>
-            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/04/10/Python-NLP-01/" data-title="Facebook">
+            <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://ice-melt.github.io/2019/04/10/Python_NLP_01/" data-title="Facebook">
               <i class="fa fa-facebook"></i>
             </a>
           </li>
           <li>
-            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/04/10/Python-NLP-01/&via=https://ice-melt.github.io" data-title="Twitter">
+            <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Python自然语言处理01 语言处理与Python》 — 夕兮曦兮的个人网站&url=https://ice-melt.github.io/2019/04/10/Python_NLP_01/&via=https://ice-melt.github.io" data-title="Twitter">
               <i class="fa fa-twitter"></i>
             </a>
           </li>
           <li>
-            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/04/10/Python-NLP-01/" data-title="Google+">
+            <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://ice-melt.github.io/2019/04/10/Python_NLP_01/" data-title="Google+">
               <i class="fa fa-google-plus"></i>
             </a>
           </li>
@@ -404,7 +366,7 @@ MathJax.Hub.Queue(function() {
 <div class="post-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;" id="wxShare-close">×</a>
     <p>扫一扫，分享到微信</p>
-    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/04/10/Python-NLP-01/" alt="微信分享二维码">
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://ice-melt.github.io/2019/04/10/Python_NLP_01/" alt="微信分享二维码">
 </div>
 
 <div class="mask"></div>
@@ -418,8 +380,6 @@ MathJax.Hub.Queue(function() {
       
     <a href="/tags/Python自然语言处理/" class="color3">Python自然语言处理</a>
       
-    <a href="/tags/NLP/" class="color4">NLP</a>
-      
   </li>
 
         </ul>
@@ -431,14 +391,14 @@ MathJax.Hub.Queue(function() {
 
     <aside class="post-toc-pos post-toc-top" id="post-toc">
         <nav class="post-toc-wrap">
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-1-语言计算-文本及词汇"><span class="post-toc-text">1.1 语言计算:文本及词汇</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NLTK入门"><span class="post-toc-text">NLTK入门</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#搜索文本"><span class="post-toc-text">搜索文本</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#计数词汇"><span class="post-toc-text">计数词汇</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-2-近观Python-将文本当做词链表"><span class="post-toc-text">1.2 近观Python:将文本当做词链表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-3-计算语言-简单的统计"><span class="post-toc-text">1.3 计算语言:简单的统计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#频率分布"><span class="post-toc-text">频率分布</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#细粒度的选择词"><span class="post-toc-text">细粒度的选择词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词语搭配和双连词"><span class="post-toc-text">词语搭配和双连词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#计算其他东西"><span class="post-toc-text">计算其他东西</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#表1-2-NLTK频率分布类中定义的函数"><span class="post-toc-text">表1-2   NLTK频率分布类中定义的函数</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-4-回到Python-决策与控制"><span class="post-toc-text">1.4 回到Python:决策与控制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#表1-3-数值比较运算符-略"><span class="post-toc-text">表1-3 数值比较运算符(略)</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#表1-4-词汇比较运算符"><span class="post-toc-text">表1-4 词汇比较运算符</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#对每个元素进行操作"><span class="post-toc-text">对每个元素进行操作</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#嵌套代码块-略"><span class="post-toc-text">嵌套代码块(略)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#条件循环-略"><span class="post-toc-text">条件循环(略)</span></a></li></ol><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-5-自动理解自然语言"><span class="post-toc-text">1.5 自动理解自然语言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词义消歧"><span class="post-toc-text">词义消歧</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#指代消解-anaphora-resolution"><span class="post-toc-text">指代消解(anaphora resolution):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#自动生成语言"><span class="post-toc-text">自动生成语言</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#机器翻译"><span class="post-toc-text">机器翻译</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#人机对话系统"><span class="post-toc-text">人机对话系统</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#文本的含义"><span class="post-toc-text">文本的含义</span></a></li></ol></li>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-1-语言计算-文本及词汇"><span class="post-toc-text">1.1 语言计算:文本及词汇</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#NLTK入门"><span class="post-toc-text">NLTK入门</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#搜索文本"><span class="post-toc-text">搜索文本</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#计数词汇"><span class="post-toc-text">计数词汇</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-2-近观Python-将文本当做词链表"><span class="post-toc-text">1.2 近观Python:将文本当做词链表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-3-计算语言-简单的统计"><span class="post-toc-text">1.3 计算语言:简单的统计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#频率分布"><span class="post-toc-text">频率分布</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#细粒度的选择词"><span class="post-toc-text">细粒度的选择词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词语搭配和双连词"><span class="post-toc-text">词语搭配和双连词</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#计算其他东西"><span class="post-toc-text">计算其他东西</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-4-回到Python-决策与控制"><span class="post-toc-text">1.4 回到Python:决策与控制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#对每个元素进行操作"><span class="post-toc-text">对每个元素进行操作</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#嵌套代码块-略"><span class="post-toc-text">嵌套代码块(略)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#条件循环-略"><span class="post-toc-text">条件循环(略)</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-5-自动理解自然语言"><span class="post-toc-text">1.5 自动理解自然语言</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#词义消歧"><span class="post-toc-text">词义消歧</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#指代消解-anaphora-resolution"><span class="post-toc-text">指代消解(anaphora resolution):</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#自动生成语言"><span class="post-toc-text">自动生成语言</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#机器翻译"><span class="post-toc-text">机器翻译</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#人机对话系统"><span class="post-toc-text">人机对话系统</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#文本的含义"><span class="post-toc-text">文本的含义</span></a></li></ol></li></ol>
         </nav>
     </aside>
     
 
 <nav id="article-nav">
   
-    <a href="/2019/04/12/Python-NLP-02/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/04/12/Python_NLP_02/" id="article-nav-newer" class="article-nav-link-wrap">
 
       <span class="article-nav-title">
         <i class="fa fa-hand-o-left" aria-hidden="true"></i>
@@ -459,7 +419,7 @@ MathJax.Hub.Queue(function() {
 
 
     
-        <div id="SOHUCS" sid="Python-NLP-01"></div>
+        <div id="SOHUCS" sid="Python_NLP_01"></div>
 <script type="text/javascript">
     (function(){
         var appid = 'cytRPCpOX';
@@ -521,10 +481,10 @@ MathJax.Hub.Queue(function() {
 <div class="sidebar-menu-box" id="sidebar-menu-box">
     <div class="sidebar-menu-box-container">
         <div id="sidebar-menu-box-categories">
-            
+            <a class="category-link" href="/categories/NLP/">NLP</a>
         </div>
         <div id="sidebar-menu-box-tags">
-            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
         </div>
     </div>
     <a href="javascript:;" class="sidebar-menu-box-close">&times;</a>
@@ -557,7 +517,7 @@ MathJax.Hub.Queue(function() {
     <div class="mobile-header-tag-container">
         <span class="title">Tags</span>
         <div id="mobile-header-container-tags">
-            <a href="/tags/NLP/" style="font-size: 20px;">NLP</a> <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
+            <a href="/tags/Python自然语言处理/" style="font-size: 20px;">Python自然语言处理</a> <a href="/tags/人工智能/" style="font-size: 10px;">人工智能</a> <a href="/tags/建站/" style="font-size: 10px;">建站</a>
         </div>
     </div>
 </div>
@@ -607,6 +567,23 @@ MathJax.Hub.Queue(function() {
      $(".article-entry p img").popImg();
   </script>
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src>
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
 </body>
 </html>
